@@ -13,7 +13,7 @@ const SidebarLink: FunctionComponent<SidebarLinkProps> = ({ icon, redirectUrl })
 
     return (
         <span
-            className="px-6 py-2 flex gap-2 items-center justify-center m-2 rounded-md hover:bg-slate-700 hover:text-white cursor-pointer"
+            className="sm:px-6 py-2 flex gap-2 items-center justify-center sm:rounded-md sm:hover:bg-slate-700 sm:hover:text-white cursor-pointer"
             onClick={() => push(redirectUrl)}
         >
             <FontAwesomeIcon icon={icon} className="text-xl"/>
