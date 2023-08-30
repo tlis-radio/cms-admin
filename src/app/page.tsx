@@ -1,25 +1,13 @@
 'use client';
-import Navbar from '@/components/navbar';
-import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation'
 
 const Home = () => {
-  const { user, error, isLoading } = useUser();
+  const router = useRouter()
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
-  if (user) {
-    return (
-      <>
-        <Navbar />
-        <div className='flex flex-row pt-[70px] pl-[80px]'>
-          Home
-        </div>
-      </>
-    );
+  // Make sure we're in the browser
+  if (typeof window !== 'undefined') {
+    router.push('/management/shows')
   }
-
-  return <a href="/api/auth/login">Login</a>;
 }
 
-export default withPageAuthRequired(Home);
+export default Home;
