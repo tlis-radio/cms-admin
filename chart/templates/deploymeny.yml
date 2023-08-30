@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: { { .Release.Name } }
+  labels:
+    app: { { .Release.Name } }
+spec:
+  replicas: { { .Values.spec.replicas } }
+  selector:
+    matchLabels:
+      service: { { .Release.Name } }
+  template:
+    metadata:
+      labels:
+        app: { { .Release.Name } }
+        service: { { .Release.Name } }
+    spec:
+      containers:
+        - name: { { .Release.Name } }
+          image: tliscr.azurecr.io/cms-admin-web:{{ .Chart.AppVersion }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:80

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cms-admin-web
+version: 1.0.0
+description: Cms admin web
+type: application
+keywords:
+  - cms
+  - admin-web
+home: www.tlis.sk
