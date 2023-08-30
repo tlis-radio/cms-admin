@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { { .Release.Name } }
+  name: {{ .Release.Name }}
   labels:
-    app: { { .Release.Name } }
+    app: {{ .Release.Name }}
 spec:
-  replicas: { { .Values.spec.replicas } }
+  replicas: {{ .Values.spec.replicas }}
   selector:
     matchLabels:
-      service: { { .Release.Name } }
+      service: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: { { .Release.Name } }
-        service: { { .Release.Name } }
+        app: {{ .Release.Name }}
+        service: {{ .Release.Name }}
     spec:
       containers:
-        - name: { { .Release.Name } }
+        - name: {{ .Release.Name }}
           image: tliscr.azurecr.io/cms-admin-web:{{ .Chart.AppVersion }}
           imagePullPolicy: IfNotPresent
           ports:
