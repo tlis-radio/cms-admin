@@ -4,12 +4,13 @@ import logo from '../../public/tlis-WS-black.png';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { faPersonRunning, faDoorOpen, faBars } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Sidebar from './sidebar';
 
 const Navbar = () => {
     const { user } = useUser();
 
     return (
-        <nav className='bg-white flex p-4 items-center justify-between fixed w-full'>
+        <nav className='bg-white flex p-4 items-center justify-between fixed top-0 w-full h-[70px]'>
             <span className='sm:hidden text-xl'><FontAwesomeIcon icon={faBars} /></span>
             <span className='flex flex-row items-center gap-4'>
                 <Image
@@ -27,6 +28,7 @@ const Navbar = () => {
                 <FontAwesomeIcon icon={faPersonRunning} />
                 <FontAwesomeIcon icon={faDoorOpen} />
             </a>
+            <Sidebar />
         </nav>
     )
 }

@@ -12,7 +12,7 @@ const Home = () => {
     return (
       <>
         <Navbar />
-        <div className="pt-20">
+        <div className='flex flex-row pt-[70px] pl-[80px]'>
           Home
         </div>
       </>
