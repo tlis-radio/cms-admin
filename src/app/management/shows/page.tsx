@@ -27,7 +27,8 @@ const Shows: FunctionComponent = () => {
     })
 
     return (
-        <div className='bg-white p-4'>
+        <div className='flex flex-col gap-4 bg-white p-4'>
+            <h1 className='font-bold border-b'>Nová relácia</h1>
             <form onSubmit={onSubmit} className='flex flex-col gap-4'>
                 <Input
                     label='Názov relácie'
