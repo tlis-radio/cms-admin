@@ -10,8 +10,8 @@ const ManagementLayout = ({
   return (
     <>
         <Navbar />
-        <div className='flex flex-row pt-[70px] pl-[80px]'>
-            {children}
+        <div className='flex flex-row justify-center h-full pt-[70px] pl-[50px] sm:pl-[80px] w-full mt-4'>
+          {children}
         </div>
     </>
   );
