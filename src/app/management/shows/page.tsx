@@ -1,60 +1,54 @@
 'use client';
+import { ShowDto } from '@/app/api/show-management/dtos/show-dto';
 import { PaginationDto } from '@/app/api/user-management/dtos/pagination-dto';
-import { UserDto } from '@/app/api/user-management/dtos/user-dto';
-import Input from '@/components/form/input';
-import MultiSelect, { MultiSelectData } from '@/components/form/multi-select';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { FunctionComponent } from "react";
-import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { FunctionComponent, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import Button from '@/components/button';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import Table from '@/components/table';
 
-type ShowFormValues = {
-    name: string;
-    description: string;
-    moderators: Array<MultiSelectData>;
-};
+const limit = 10;
+const tableHeadings = ['#', 'Názov', ''];
 
-const Shows: FunctionComponent = () => {
-    const {register, handleSubmit, setError, formState: { errors, isValidating } } = useForm<ShowFormValues>();
+const Shows: FunctionComponent = ()=> {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const page = parseInt(searchParams.get('page') ?? "1");
 
-    const onSubmit = handleSubmit(async (data) => {
-        await CmsApiService.PostAsync("/api/show-management",
-        {
-            name: data.name,
-            description: data.description,
-            moderatorIds: data.moderators?.map((moderator) => { return moderator.id; })
-        });
-    })
+    useEffect(() =>
+    {
+        const fetchData = async () => {
+            var response = await CmsApiService.GetAsync<PaginationDto<ShowDto>>(`/api/show-management?limit=${limit}&page=${[page]}`);
+            console.warn(response);
+        };
+        fetchData();
+    }, [page])
 
     return (
-        <div className='flex flex-col gap-4 bg-white p-4'>
-            <h1 className='font-bold border-b'>Nová relácia</h1>
-            <form onSubmit={onSubmit} className='flex flex-col gap-4'>
-                <Input
-                    label='Názov relácie'
-                    placeholder='Názov relácie'
-                    registerReturn={register("name", { required: "Relácia musí obsahovať názov." } )}
-                    error={errors?.name}
+        <div className="flex flex-col gap-4 w-full">
+            <div className="overflow-hidden border-b">
+                <Table
+                    headings={tableHeadings}
+                    data={[[1, 'Mark', ''], [2, 'Jacob', ''], [3, 'Larry', '']]}
                 />
-                <Input
-                    label='Popis relácie'
-                    placeholder='Popis relácie'
-                    registerReturn={register("description", { required: "Relácia musí obsahovať popis." })}
-                    error={errors?.description}
+            </div>
+            <span className='flex justify-between'>
+                <Button
+                    onClick={() => router.push(`${pathname}?page=${page-1}`)}
+                    icon={faArrowLeft}
                 />
-                <MultiSelect
-                    label='Moderátori'
-                    fetchData={(limit, page) => CmsApiService.GetAsync<PaginationDto<UserDto>>(`/api/user-management?limit=${limit}&page=${page}`)}
-                    dataToSelectDataConverter={(data: PaginationDto<UserDto>) => data.results ? data.results?.map((user) => { return { id: user.id, value: user.nickname }}) : []}
-                    registerReturn={register("moderators", { minLength: 1 })}
-                    setError={setError}
-                    error={errors?.moderators}
+                <Button
+                    onClick={() => router.push(`${pathname}?page=${page+1}`)}
+                    icon={faArrowRight}
                 />
-
-                <input type="submit" value="Uložiť" className="bg-slate-500 hover:bg-slate-700 cursor-pointer text-white font-bold py-2 px-4 rounded" />
-            </form>
+            </span>
         </div>
-    );
+    )
 };
-  
+
 export default withPageAuthRequired(Shows);
