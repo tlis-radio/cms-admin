@@ -40,7 +40,7 @@ export const GET = withApiAuthRequiredExtended(
         }
       });
 
-      return NextResponse.json(await page.text(), response);
+      return NextResponse.json(await page.json(), response);
     } catch {
       return NextResponse.json(null, { status: 500 });
     }

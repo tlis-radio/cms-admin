@@ -6,7 +6,7 @@ const TableBody: React.FC<TableBodyProps> = ({ data }) => {
 
     const renderRow = (row: Array<number | string>, index: number) => {
         return (
-            <tr>
+            <tr className="border-b" key={index}>
                 {row.map((cell, index) => (
                     <td key={index} className="whitespace-nowrap px-6 py-4 font-medium">{cell}</td>
                 ))}
