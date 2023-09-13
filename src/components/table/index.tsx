@@ -1,10 +1,11 @@
+import React from "react";
 import TableBody from "./table-body";
 import TableHead from "./table-head";
 
 type TableProps = {
     className?: string;
     headings: string[];
-    data: Array<Array<number | string>>;
+    data: Array<Array<number | string | React.ReactNode>>;
 };
 
 const Table: React.FC<TableProps> = ({ headings, data, className }) => {

@@ -1,4 +1,5 @@
 'use client';
+
 import { ShowDto } from '@/app/api/show-management/dtos/show-dto';
 import { PaginationDto } from '@/app/api/user-management/dtos/pagination-dto';
 import CmsApiService from '@/services/cms-api-service';
@@ -8,14 +9,15 @@ import { FunctionComponent } from 'react';
 import { usePathname } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import Button from '@/components/button';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Table from '@/components/table';
 import { useQuery } from '@tanstack/react-query';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const limit = 4;
 const tableHeadings = ['Názov', ''];
 
-const Shows: FunctionComponent = ()=> {
+const Shows: FunctionComponent = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -29,22 +31,34 @@ const Shows: FunctionComponent = ()=> {
 
     if (isLoading) return <div>Loading...</div>
 
+    const getData = () => data?.results?.map((show, index) => [
+        show.name,
+        <FontAwesomeIcon
+            className='cursor-pointer'
+            key={index}
+            icon={faPenToSquare}
+            onClick={() => router.push(`${pathname}/form?id=${show.id}`)}
+        />
+    ]) ?? []
+
     return (
         <div className="flex flex-col gap-4 w-full">
             <div className="overflow-hidden">
                 <Table
                     headings={tableHeadings}
-                    data={data?.results.map((show) => [show.name, '']) ?? []}
+                    data={getData()}
                 />
             </div>
             <span className='flex justify-between'>
                 <Button
-                    onClick={() => router.push(`${pathname}?page=${page-1}`)}
+                    onClick={() => page > 1 && router.push(`${pathname}?page=${page-1}`)}
                     icon={faArrowLeft}
+                    disabled={page <= 1}
                 />
                 <Button
                     onClick={() => router.push(`${pathname}?page=${page+1}`)}
                     icon={faArrowRight}
+                    disabled={isLoading || data?.totalPages == page}
                 />
             </span>
         </div>

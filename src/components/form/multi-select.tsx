@@ -6,6 +6,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { faGear, faArrowsUpDown, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PaginationDto } from "@/app/api/user-management/dtos/pagination-dto";
+import { FetchNextPageOptions } from '@tanstack/react-query';
 
 export type MultiSelectData = {
     id: string;
@@ -15,44 +16,30 @@ export type MultiSelectData = {
 type MultiSelectProps = {
     label: string;
     error: Merge<FieldError, FieldErrorsImpl<MultiSelectData>> | undefined;
+    selectedOptions: Array<MultiSelectData>;
+    options: Array<MultiSelectData>;
+    isLoading: boolean;
+    fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
     setError: UseFormSetError<any>;
-    fetchData: (limit: number, usersPage: number) => Promise<PaginationDto<any>>;
-    dataToSelectDataConverter: (data: PaginationDto<any>) => Array<MultiSelectData>;
     registerReturn: UseFormRegisterReturn;
 }
 
-const limit = 10;
-
 const MultiSelect: FunctionComponent<MultiSelectProps> = ({
-    label, error, fetchData, dataToSelectDataConverter, registerReturn, setError
+    label,
+    error,
+    isLoading,
+    fetchMoreData,
+    registerReturn,
+    setError,
+    selectedOptions,
+    options
 }): JSX.Element => {
-    const [selectedOptions, setSelectedOptions] = useState<Array<MultiSelectData>>([]);
-    const [data, setData] = useState<Array<MultiSelectData>>([]);
-    const [dataScrollPage, setDataScrollPage] = useState(1);
-    const [isLastDataPage, setIsLastDataPage] = useState(false);
-    const [fetchMoreData, setfetchMoreData] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const memorizedFetchData = useCallback(fetchData, [fetchData]);
-    const memorizedOnScroll = useCallback((target: HTMLElement) => {
-        setfetchMoreData(Math.floor(target.scrollHeight - target.scrollTop) == target.clientHeight);
-    }, [setfetchMoreData]);
-
-    useEffect(() => {
-        if (fetchMoreData && !isLoading && !isLastDataPage) {
-            setfetchMoreData(false);
-            setIsLoading(true);
-
-            const callFetchData = async () => {
-                var response = await memorizedFetchData(limit, dataScrollPage);
-                setData(data.concat(dataToSelectDataConverter(response)));
-                setIsLoading(false);
-                setDataScrollPage(dataScrollPage + 1);
-                setIsLastDataPage(response.totalPages === response.page);
-            }
-            callFetchData();
+    const memorizedOnScroll = useCallback(async (target: HTMLElement) => {
+        if (fetchMoreData && Math.floor(target.scrollHeight - target.scrollTop) == target.clientHeight)
+        {
+            await fetchMoreData();
         }
-    }, [memorizedFetchData, dataToSelectDataConverter, dataScrollPage, fetchMoreData, isLastDataPage, isLoading, data]);
+    }, [fetchMoreData]);
 
     useEffect(() => {
         if (!error && selectedOptions.length < 1)
@@ -67,7 +54,6 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
             <Listbox
                 value={selectedOptions}
                 onChange={(e) => {
-                    setSelectedOptions(e);
                     registerReturn.onChange({ target: { name: registerReturn.name, value: e } });
                 }}
                 multiple
@@ -91,7 +77,7 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
                             onScroll={(e) => memorizedOnScroll(e.target as HTMLElement)}
                             className="absolute mt-1 max-h-60 w-full overflow-auto bg-white shadow appearance-none border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
                         >
-                            {data.map((option) => (
+                            {options.map((option) => (
                                 <Listbox.Option
                                     key={option.id}
                                     className={({ active }) =>

@@ -1,5 +1,5 @@
 type TableBodyProps = {
-    data: Array<Array<number | string>>;
+    data: Array<Array<number | string | React.ReactNode>>;
 };
 
 const TableBody: React.FC<TableBodyProps> = ({ data }) => {

@@ -15,7 +15,8 @@ export const GET = withApiAuthRequiredExtended(
         // `${env.CMS_API_URL}/usermanagement/User/pagination?IsActive=true&Limit=${limit}&Page=${pagenumber}`, {
         `https://cms.api.development.tlis.sk/usermanagement/User/pagination?IsActive=true&Limit=${limit}&Page=${pagenumber}`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
         }
       });
 

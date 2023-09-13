@@ -19,7 +19,7 @@ class CmsApiService
     {
         const response = await fetch(uri);
 
-        return await response.json();
+        return response.json();
     }
 }
 
