@@ -1,11 +1,10 @@
-import { Fragment, FunctionComponent, useCallback, useEffect, useState } from "react";
+import { Fragment, FunctionComponent, useCallback } from "react";
 import { ErrorOption, FieldError, FieldErrorsImpl, Merge, UseFormRegisterReturn, UseFormSetError } from "react-hook-form";
 import InputLabel from "./input-label";
 import InputError from "./input-error";
 import { Listbox, Transition } from "@headlessui/react";
 import { faGear, faArrowsUpDown, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { PaginationDto } from "@/app/api/user-management/dtos/pagination-dto";
 import { FetchNextPageOptions } from '@tanstack/react-query';
 
 export type MultiSelectData = {
@@ -22,6 +21,7 @@ type MultiSelectProps = {
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
     setError: UseFormSetError<any>;
     registerReturn: UseFormRegisterReturn;
+    onChange: (...event: any[]) => void;
 }
 
 const MultiSelect: FunctionComponent<MultiSelectProps> = ({
@@ -32,7 +32,8 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
     registerReturn,
     setError,
     selectedOptions,
-    options
+    options,
+    onChange
 }): JSX.Element => {
     const memorizedOnScroll = useCallback(async (target: HTMLElement) => {
         if (fetchMoreData && Math.floor(target.scrollHeight - target.scrollTop) == target.clientHeight)
@@ -41,21 +42,23 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
         }
     }, [fetchMoreData]);
 
-    useEffect(() => {
-        if (!error && selectedOptions.length < 1)
-        {
-            setError(registerReturn.name, { type: 'minLength', message: 'Relácia musí obsahovať aspoň jedného moderátora.' });
-        }
-    }, [registerReturn, selectedOptions, setError, error]);
+    // useEffect(() => {
+    //     if (!error && selectedOptions.length < 1)
+    //     {
+    //         setError(registerReturn.name, { type: 'minLength', message: 'Relácia musí obsahovať aspoň jedného moderátora.' });
+    //     }
+    // }, [registerReturn, selectedOptions, setError, error]);
+
+    const getValues = (): MultiSelectData[] => {
+        return options.filter((option) => selectedOptions?.find(v => v.id == option.id));
+    };
 
     return (
         <div className="flex flex-col gap-2 w-72">
             <InputLabel label={label}/>
             <Listbox
-                value={selectedOptions}
-                onChange={(e) => {
-                    registerReturn.onChange({ target: { name: registerReturn.name, value: e } });
-                }}
+                value={getValues()}
+                onChange={onChange}
                 multiple
             >
                 <div className="relative mt-1">

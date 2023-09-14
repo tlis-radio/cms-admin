@@ -4,7 +4,7 @@ type TableBodyProps = {
 
 const TableBody: React.FC<TableBodyProps> = ({ data }) => {
 
-    const renderRow = (row: Array<number | string>, index: number) => {
+    const renderRow = (row: Array<number | string | React.ReactNode>, index: number) => {
         return (
             <tr className="border-b" key={index}>
                 {row.map((cell, index) => (
