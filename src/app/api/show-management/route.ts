@@ -25,25 +25,3 @@ export const POST = withApiAuthRequiredExtended(
     }
   }
 );
-
-export const GET = withApiAuthRequiredExtended(
-  async (request: NextRequest, response: NextResponse) => {
-    try {
-      const limit = request.nextUrl.searchParams.get("limit");
-      const pagenumber = request.nextUrl.searchParams.get("page");
-
-      const page = await fetch(
-        `${env.CMS_API_URL}/showmanagement/show/pagination?Limit=${limit}&Page=${pagenumber}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      return NextResponse.json(await page.json(), response);
-    } catch {
-      return NextResponse.json(null, { status: 500 });
-    }
-  }
-);
-  

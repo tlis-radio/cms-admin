@@ -2,7 +2,7 @@ export type ShowDto = {
     id: string;
     name: string;
     description: string;
-    moderatorIds: Array<string>;
+    moderators: Array<{ id: string, nickName: string }>;
     createdDate: string;
     ProfileImageUrl?: string;
 };

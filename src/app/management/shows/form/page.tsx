@@ -52,7 +52,7 @@ const ShowForm: React.FC = () => {
         if (showData) {
             setValue("name", showData.name);
             setValue("description", showData.description);
-            setValue("moderators", showData.moderatorIds.map((id) => { return { id: id, value: "TODO" }}));
+            setValue("moderators", showData.moderators.map((m) => { return { id: m.id, value: m.nickName }}));
         }
     }, [showData, setValue, userOptions]);
 

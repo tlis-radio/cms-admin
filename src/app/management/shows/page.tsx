@@ -24,7 +24,7 @@ const Shows: FunctionComponent = () => {
     const page = parseInt(searchParams.get('page') ?? "1");
     const { isLoading, data } = useQuery({
         queryKey: ['showsPage', page],
-        queryFn: async () => CmsApiService.GetAsync<PaginationDto<ShowDto>>(`/api/show-management?limit=${limit}&page=${[page]}`),
+        queryFn: async () => CmsApiService.GetAsync<PaginationDto<ShowDto>>(`/api/show-management/pagination?limit=${limit}&page=${[page]}`),
         keepPreviousData: true,
         staleTime: 5000
     });
