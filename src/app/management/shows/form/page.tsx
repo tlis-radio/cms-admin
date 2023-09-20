@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { ShowDto } from '@/app/api/show-management/dtos/show-dto';
+import { ShowDto } from '@/models/show';
 
 type ShowFormValues = {
     name: string;

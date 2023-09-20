@@ -18,7 +18,7 @@ export const GET = withApiAuthRequired(
 
       return NextResponse.json(await response.json());
     } catch {
-      return NextResponse.json({}, { status: 500 });
+      return NextResponse.json({ status: 500 });
     }
   }
 );
