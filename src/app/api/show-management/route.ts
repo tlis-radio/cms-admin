@@ -2,12 +2,10 @@ import { getAccessToken, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { NextResponse, NextRequest } from "next/server";
 import { env } from "process";
 
-const withApiAuthRequiredExtended = withApiAuthRequired as any;
-
-export const POST = withApiAuthRequiredExtended(
-  async (request: NextRequest, response: NextResponse) => {
+export const POST = withApiAuthRequired(
+  async (request: NextRequest) => {
     try {
-      const { accessToken } = await getAccessToken(request, response);
+      const { accessToken } = await getAccessToken(request, new NextResponse());
 
       const page = await fetch(
         `${env.CMS_API_URL}/showmanagement/show`, {
@@ -19,9 +17,9 @@ export const POST = withApiAuthRequiredExtended(
         body: JSON.stringify(await request.json())
       });
 
-      return NextResponse.json(await page.text(), response);
+      return NextResponse.json(await page.text());
     } catch {
-      return NextResponse.json(null, { status: 500 });
+      return NextResponse.json({ status: 500 });
     }
   }
 );
