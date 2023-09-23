@@ -1,12 +1,50 @@
 import { Pagination, PaginationDto } from "@/models/pagination";
-import { Show, ShowDto } from "@/models/show";
+import { CreateShowDto, Show, ShowDto, UpdateShowDto } from "@/models/show";
 import { User, UserDto } from "@/models/user";
 
 const getAsync = async <T>(uri: string) : Promise<T> =>
 {
     const response = await fetch(uri);
 
+    if (response.status >= 400) {
+        throw new Error(response.statusText);
+    }
+
     return response.json();
+}
+
+const postAsync = async <T>(uri: string, body: T) : Promise<void> =>
+{
+    var response = await fetch(
+        uri,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+
+    if (response.status >= 400) {
+        throw new Error(response.statusText);
+    }
+}
+
+const putAsync = async <T>(uri: string, body: T) : Promise<void> =>
+{
+    var response = await fetch(
+        uri,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+
+    if (response.status >= 400) {
+        throw new Error(response.statusText);
+    }
 }
 
 const showEndpoints = {
@@ -29,6 +67,12 @@ const showEndpoints = {
         const result = await getAsync<ShowDto>(`/api/show-management/${id}`);
 
         return Show.fromDto(result);
+    },
+    CreateNewAsync: async (dto: CreateShowDto) : Promise<void> => {
+        await postAsync("/api/show-management", dto);
+    },
+    UpdateAsync: async (id: string, dto: UpdateShowDto) : Promise<void> => {
+        await putAsync(`/api/show-management/${id}`, dto);
     }
 };
 
