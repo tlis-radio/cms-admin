@@ -35,6 +35,7 @@ const Shows: FunctionComponent = () => {
 
     return (
         <PaginationTable
+            title='Relácie'
             tableHeadings={tableHeadings}
             queryKey='showsPage'
             queryFn={CmsApiService.Show.PaginationAsync}

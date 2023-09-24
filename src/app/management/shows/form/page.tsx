@@ -26,7 +26,8 @@ const ShowForm: React.FC = () => {
     });
 
     const { data: showData, isFetching: showIsFetching, error: showError } = useQuery(
-        { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity });
+        { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null });
+
     const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
         queryKey: ['users'],
         queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
