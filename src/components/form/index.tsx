@@ -1,7 +1,10 @@
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { UseFormHandleSubmit } from "react-hook-form";
 import ServerError from "./server-error";
 import { useEffect, useState } from "react";
+import { getParentFolder } from "@/utils/routing";
+import Button from "../button";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
 
 type FormProps = {
     title: string,
@@ -24,6 +27,7 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
     children
 }) => {
     const router = useRouter();
+    const pathname = usePathname();
     const [ serverError, setServerError ] = useState<unknown>();
 
     useEffect(() => {
@@ -31,21 +35,15 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
     }, [otherServerError]);
 
     const onSubmit = handleSubmit(async (data) => {
-        if (isUpdate)
+        try
         {
-            try
-            {
-                await updateFn(data);
-                router.push("../");
-            }
-            catch (error)
-            {
-                setServerError(error);
-            }
+            isUpdate ? await updateFn(data) : await createFn(data); 
+
+            router.push(getParentFolder(pathname));
         }
-        else
+        catch (error)
         {
-            await createFn(data);
+            setServerError(error);
         }
     });
 
@@ -60,7 +58,14 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
             {serverError != undefined && <ServerError error={serverError} />}
             <form onSubmit={onSubmit} className='flex flex-col gap-4'>
                 {children}
-                <input type="submit" value="Uložiť" className="bg-slate-500 hover:bg-slate-700 cursor-pointer text-white font-bold py-2 px-4 rounded" />
+                <span className="flex flex-row justify-between">
+                    <Button icon={faArrowLeft} onClick={() => router.push(getParentFolder(pathname))} />
+                    <input
+                        type="submit"
+                        value="Uložiť"
+                        className="bg-emerald-500 hover:bg-emerald-700 cursor-pointer text-white font-bold py-2 px-4 rounded"
+                    />
+                </span>
             </form>
         </div>
     );
