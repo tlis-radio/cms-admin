@@ -1,22 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { env } from "process";
+import { fetchGet } from "@/utils/fetch-wrapper";
+import { NextRequest } from "next/server";
 
-export const GET = async (request: NextRequest) => {
-    try {
-        const limit = request.nextUrl.searchParams.get("limit");
-        const pagenumber = request.nextUrl.searchParams.get("page");
+export const GET = (request: NextRequest) => {
+    const limit = request.nextUrl.searchParams.get("limit");
+    const pagenumber = request.nextUrl.searchParams.get("page");
 
-        const response = await fetch(
-            `${env.CMS_API_URL}/showmanagement/show/pagination?Limit=${limit}&Page=${pagenumber}`, {
-            method: 'GET',
-            headers: {
-            'Content-Type': 'application/json'
-            }
-        });
-
-        return NextResponse.json(await response.json());
-    } catch {
-        return NextResponse.json({ status: 500 });
-    }
+    return fetchGet({ path: `showmanagement/show/pagination?Limit=${limit}&Page=${pagenumber}` });
 };
     

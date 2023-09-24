@@ -1,24 +1,10 @@
-import { getAccessToken, withApiAuthRequired } from "@auth0/nextjs-auth0";
-import { NextResponse } from "next/server";
-import { env } from "process";
+import { fetchGet, fetchPut } from "@/utils/fetch-wrapper";
+import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 
 export const GET = withApiAuthRequired(
-  async (request, context) => {
-    try {
-      const { accessToken } = await getAccessToken(request, new NextResponse());
+  (_, context) => fetchGet({path: `showmanagement/show/${context.params?.id}`, isAuthorized: true})
+);
 
-      const response = await fetch(
-        `${env.CMS_API_URL}/showmanagement/show/${context.params?.id}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      return NextResponse.json(await response.json());
-    } catch {
-      return NextResponse.json({ status: 500 });
-    }
-  }
+export const PUT = withApiAuthRequired(
+  (request, context) => fetchPut({path: `showmanagement/show/${context.params?.id}`, body: request})
 );
