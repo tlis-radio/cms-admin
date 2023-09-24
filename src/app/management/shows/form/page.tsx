@@ -5,7 +5,7 @@ import MultiSelect, { MultiSelectData } from '@/components/form/multi-select';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
@@ -25,7 +25,8 @@ const ShowForm: React.FC = () => {
         defaultValues: { name: "", description: "", moderators: [] }
     });
 
-    const { data: showData, isFetching: showIsFetching } = useQuery({ queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity });
+    const { data: showData, isFetching: showIsFetching, error: showError } = useQuery(
+        { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity });
     const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
         queryKey: ['users'],
         queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
@@ -68,6 +69,7 @@ const ShowForm: React.FC = () => {
             title={id ? "Upraviť reláciu" : "Nová relácia"}
             isLoading={id !== null && showIsFetching}
             isUpdate={id !== null}
+            otherServerError={showError}
             handleSubmit={handleSubmit}
             updateFn={updateFn}
             createFn={createFn}
