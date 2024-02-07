@@ -7,4 +7,3 @@ export const GET = (request: NextRequest) => {
 
     return fetchGet({ path: `showmanagement/show/pagination?Limit=${limit}&Page=${pagenumber}` });
 };
-    
