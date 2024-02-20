@@ -16,7 +16,7 @@ type UserFormValues = {
    lastname: string;
    nickname: string;
    email: string;
-   description: string;
+   abouth: string;
    isActive: boolean;
    roleHistory: Array<MultiSelectData>;
 };
@@ -27,7 +27,7 @@ const UserForm: React.FC = () => {
    const searchParams = useSearchParams();
    const id = searchParams.get('id');
    const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<UserFormValues>({
-      defaultValues: { profileImageUrl: "",firstname: "", lastname: "", nickname: "", email: "", description: "", isActive: true, roleHistory: [] }
+      defaultValues: { profileImageUrl: "",firstname: "", lastname: "", nickname: "", email: "", abouth: "", isActive: true, roleHistory: [] }
    });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
@@ -51,9 +51,9 @@ const UserForm: React.FC = () => {
          setValue("lastname", userData.lastname);
          setValue("nickname", userData.nickname);
          setValue("email", userData.email);
-         setValue("description", userData.description);
+         setValue("abouth", userData.abouth);
          setValue("isActive", userData.isActive);
-         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.id, value: m.nickName } }));
+         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.id, value: m.name } }));
       }
    }, [userData, setValue, userOptions]);
 
@@ -62,7 +62,7 @@ const UserForm: React.FC = () => {
 
       return CmsApiService.User.UpdateAsync(id, {
          firstname: data.firstname,
-         description: data.description,
+         abouth: data.abouth,
          roleIds: data.roleHistory?.map((role) => { return role.id; })
       });
    };
@@ -70,7 +70,7 @@ const UserForm: React.FC = () => {
    const createFn = async (data: UserFormValues) => {
       return CmsApiService.User.CreateNewAsync({
          firstname: data.firstname,
-         description: data.description,
+         abouth: data.abouth,
          roleIds: data.roleHistory?.map((role) => { return role.id; })
       });
    };
@@ -118,8 +118,8 @@ const UserForm: React.FC = () => {
          <Input
             label='Popis uživatela'
             placeholder='Popis uživatela'
-            registerReturn={register("description", { required: "Uživatel musí obsahovať popis." })}
-            error={errors?.description}
+            registerReturn={register("abouth", { required: "Uživatel musí obsahovať popis." })}
+            error={errors?.abouth}
          />
          <Controller
             name="roleHistory"

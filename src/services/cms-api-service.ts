@@ -1,6 +1,6 @@
 import { Pagination, PaginationDto } from "@/models/pagination";
 import { CreateShowDto, Show, ShowDto, UpdateShowDto } from "@/models/show";
-import { User, UserDto } from "@/models/user";
+import { CreateUserDto, User, UserDto, UpdateUserDto } from "@/models/user";
 
 const getAsync = async <T>(uri: string) : Promise<T> =>
 {
@@ -87,6 +87,21 @@ const userEndpoints = {
             result.totalPages,
             result.results.map(r => User.fromDto(r))
         );
+    },
+    GetByIdAsync: async (id: string | null) : Promise<User | undefined> => {
+        if (!id) {
+            return undefined;
+        }
+
+        const result = await getAsync<UserDto>(`/api/user-management/${id}`);
+
+        return User.fromDto(result);
+    },
+    CreateNewAsync: async (dto: CreateUserDto) : Promise<void> => {
+        await postAsync("/api/user-management", dto);
+    },
+    UpdateAsync: async (id: string, dto: UpdateUserDto) : Promise<void> => {
+        await putAsync(`/api/user-management/${id}`, dto);
     }
 };
 
