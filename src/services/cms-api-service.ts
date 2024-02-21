@@ -1,6 +1,8 @@
 import { Pagination, PaginationDto } from "@/models/pagination";
 import { CreateShowDto, Show, ShowDto, UpdateShowDto } from "@/models/show";
-import { CreateUserDto, User, UserDto, UpdateUserDto } from "@/models/user";
+import { UserBasicInformations } from "@/models/user/user-basic-informations";
+import { UserDetails } from "@/models/user/user-details";
+import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateActiveUserDto, CreateArchiveUserDto } from "@/types/user";
 
 const getAsync = async <T>(uri: string) : Promise<T> =>
 {
@@ -77,28 +79,31 @@ const showEndpoints = {
 };
 
 const userEndpoints = {
-    PaginationAsync: async (limit: number, page: number) : Promise<Pagination<User>> => {
-        const result = await getAsync<PaginationDto<UserDto>>(`/api/user-management/pagination?limit=${limit}&page=${[page]}`);
+    PaginationAsync: async (limit: number, page: number) : Promise<Pagination<UserBasicInformations>> => {
+        const result = await getAsync<PaginationDto<PaginationUserDto>>(`/api/user-management/pagination?limit=${limit}&page=${[page]}`);
 
-        return new Pagination<User>(
+        return new Pagination<UserBasicInformations>(
             result.limit,
             result.page,
             result.total,
             result.totalPages,
-            result.results.map(r => User.fromDto(r))
+            result.results.map(r => UserBasicInformations.fromDto(r))
         );
     },
-    GetByIdAsync: async (id: string | null) : Promise<User | undefined> => {
+    GetByIdAsync: async (id: string | null) : Promise<UserDetails | undefined> => {
         if (!id) {
             return undefined;
         }
 
-        const result = await getAsync<UserDto>(`/api/user-management/${id}`);
+        const result = await getAsync<GetByIdUserDto>(`/api/user-management/${id}`);
 
-        return User.fromDto(result);
+        return UserDetails.fromDto(id, result);
     },
-    CreateNewAsync: async (dto: CreateUserDto) : Promise<void> => {
+    CreateNewActiveAsync: async (dto: CreateActiveUserDto) : Promise<void> => {
         await postAsync("/api/user-management", dto);
+    },
+    CreateNewArchiveAsync: async (dto: CreateArchiveUserDto) : Promise<void> => {
+        await postAsync("/api/user-management/archive", dto);
     },
     UpdateAsync: async (id: string, dto: UpdateUserDto) : Promise<void> => {
         await putAsync(`/api/user-management/${id}`, dto);

@@ -8,8 +8,8 @@ import { usePathname } from 'next/navigation'
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Pagination } from '@/models/pagination';
-import { User } from '@/models/user';
 import PaginationTable from '@/components/pagination-table';
+import { UserBasicInformations } from '@/models/user/user-basic-informations';
 
 const tableHeadings = ['Obrázok','Login','Heslo','Tag',''];
 
@@ -17,7 +17,7 @@ const Users: FunctionComponent = () => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const dataToRowTransformationFn = (data: Pagination<User>): Array<Array<number | string | React.ReactNode>> => {
+    const dataToRowTransformationFn = (data: Pagination<UserBasicInformations>): Array<Array<number | string | React.ReactNode>> => {
         if (data?.results) {
             return data.results.map((user, index) => [
                 user.nickname,

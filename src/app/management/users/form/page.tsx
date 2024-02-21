@@ -68,6 +68,8 @@ const UserForm: React.FC = () => {
    };
 
    const createFn = async (data: UserFormValues) => {
+      // TODO: if ci vytvarame archive alebo active user
+      
       return CmsApiService.User.CreateNewAsync({
          firstname: data.firstname,
          abouth: data.abouth,
