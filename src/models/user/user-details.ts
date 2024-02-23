@@ -16,7 +16,10 @@ export class UserDetails
         functionEndDate: string | null;
         functionStartDate: string;
         description: string | null;
-        role: { name: string; }
+        role: { 
+            id: string;
+            name: string; 
+        }
     }>;
     public membershipHistory: Array<{
         description: string | null;
@@ -42,7 +45,10 @@ export class UserDetails
             functionEndDate: string | null;
             functionStartDate: string;
             description: string | null;
-            role: { name: string; }
+            role: {
+                id: string; 
+                name: string; 
+            }
         }>,
         membershipHistory: Array<{
             description: string | null;

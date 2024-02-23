@@ -1,20 +1,13 @@
-import { MembershipDto } from "./membership";
-
-export type CreateActiveUserDto = {
+export type CreateUserDto = {
     firstname: string,
     lastname: string,
     nickname: string,
-    email: string,
-    password: string,
     preferNicknameOverName: boolean,
     abouth: string,
-    memberSinceDate: string,
-    functionStartDate: string;
-    roleId: string,
-};
-
-export type CreateArchiveUserDto = {
-    //TODO:
+    email: string | null,
+    password: string,
+    roleHistory: Array<UserRoleHistoryDto>;
+    membershipHistory: Array<UserMembershipHistoryDto>;
 };
 
 export type UpdateUserDto = {
@@ -29,8 +22,9 @@ export type PaginationUserDto = {
     firstname: string;
     lastname: string;
     nickname: string;
-    isActive: boolean;
     email: string;
+    isActive: boolean;
+    roleHistory: Array<UserRoleHistoryDto>;
 }
 
 export type GetByIdUserDto = {
@@ -50,12 +44,20 @@ export type GetByIdUserDto = {
 export type UserRoleHistoryDto = {
     functionEndDate: string | null;
     functionStartDate: string;
-    role: { name: string; }
+    role: { 
+        id: string;
+        name: string; 
+    }
     description: string | null;
 };
 
 export type UserMembershipHistoryDto = {
+    membership: MembershipDto;
     description: string | null;
     changeDate: string;
-    membership: MembershipDto;
+};
+
+export type MembershipDto = {
+    id: string;
+    status: string;
 };

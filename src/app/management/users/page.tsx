@@ -11,7 +11,7 @@ import { Pagination } from '@/models/pagination';
 import PaginationTable from '@/components/pagination-table';
 import { UserBasicInformations } from '@/models/user/user-basic-informations';
 
-const tableHeadings = ['Obrázok','Login','Heslo','Tag',''];
+const tableHeadings = ['Obrázok','Login','Meno','Priezvisko','Rola','Status',''];
 
 const Users: FunctionComponent = () => {
     const router = useRouter();
@@ -21,6 +21,9 @@ const Users: FunctionComponent = () => {
         if (data?.results) {
             return data.results.map((user, index) => [
                 user.nickname,
+                user.email,
+                user.firstname,
+                user.lastname,
                 <FontAwesomeIcon
                     className='cursor-pointer'
                     key={index}

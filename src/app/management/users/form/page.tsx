@@ -11,14 +11,15 @@ import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
 
 type UserFormValues = {
-   profileImageUrl: string;
    firstname: string;
    lastname: string;
    nickname: string;
-   email: string;
+   preferNicknameOverName: boolean;
    abouth: string;
-   isActive: boolean;
+   email: string | null;
+   password: string;
    roleHistory: Array<MultiSelectData>;
+   membershipHistory: Array<MultiSelectData>;
 };
 
 const limit = 10;
@@ -27,7 +28,7 @@ const UserForm: React.FC = () => {
    const searchParams = useSearchParams();
    const id = searchParams.get('id');
    const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<UserFormValues>({
-      defaultValues: { profileImageUrl: "",firstname: "", lastname: "", nickname: "", email: "", abouth: "", isActive: true, roleHistory: [] }
+      defaultValues: { firstname: "", lastname: "", nickname: "", preferNicknameOverName: true , abouth: "", email: "", roleHistory: [], membershipHistory: [] }
    });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
@@ -46,14 +47,14 @@ const UserForm: React.FC = () => {
 
    useEffect(() => {
       if (userData) {
-         setValue("profileImageUrl", userData.profileImageUrl);
          setValue("firstname", userData.firstname);
          setValue("lastname", userData.lastname);
          setValue("nickname", userData.nickname);
-         setValue("email", userData.email);
+         setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
-         setValue("isActive", userData.isActive);
-         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.id, value: m.name } }));
+         setValue("email", userData.email);
+         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name }}));
+         setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status }} ));
       }
    }, [userData, setValue, userOptions]);
 
@@ -62,18 +63,23 @@ const UserForm: React.FC = () => {
 
       return CmsApiService.User.UpdateAsync(id, {
          firstname: data.firstname,
-         abouth: data.abouth,
-         roleIds: data.roleHistory?.map((role) => { return role.id; })
+         lastname: data.lastname,
+         nickname: data.nickname,
+         abouth: data.abouth
       });
    };
 
    const createFn = async (data: UserFormValues) => {
-      // TODO: if ci vytvarame archive alebo active user
-      
-      return CmsApiService.User.CreateNewAsync({
+      return CmsApiService.User.CreateNewActiveAsync({
          firstname: data.firstname,
+         lastname: data.lastname,
+         nickname: data.nickname,
+         email: data.email,
+         password: data.password,
+         preferNicknameOverName: data.preferNicknameOverName,
          abouth: data.abouth,
-         roleIds: data.roleHistory?.map((role) => { return role.id; })
+         roleHistory: data.roleHistory?.map((m) => { return m.id, m.value }),
+         membershipHistory: data.membershipHistory?.map((membership) => { return membership.id, membership.value })
       });
    };
 
@@ -88,11 +94,17 @@ const UserForm: React.FC = () => {
          createFn={createFn}
       >
          <Input
-            label='Fotka uživatela'
-            placeholder='Fotka uživatela'
-            registerReturn={register("profileImageUrl", { required: "Uživatel musí obsahovať fotku." })}
-            error={errors?.profileImageUrl}
+            label='Prezívka uživatela'
+            placeholder='Prezívka uživatela'
+            registerReturn={register("nickname", { required: "Uživatel musí obsahovať prezívkú." })}
+            error={errors?.nickname}
          />
+         <Input
+            label='Email uživatela'
+            placeholder='Email uživatela'
+            registerReturn={register("email", { required: "Uživatel musí obsahovať email." })}
+            error={errors?.email}
+            />
          <Input
             label='Meno uživatela'
             placeholder='Meno uživatela'
@@ -104,18 +116,6 @@ const UserForm: React.FC = () => {
             placeholder='Priezvisko uživatela'
             registerReturn={register("lastname", { required: "Uživatel musí obsahovať priezvisko." })}
             error={errors?.lastname}
-         />
-         <Input
-            label='Prezívka uživatela'
-            placeholder='Prezívka uživatela'
-            registerReturn={register("nickname", { required: "Uživatel musí obsahovať prezívkú." })}
-            error={errors?.nickname}
-         />
-         <Input
-            label='Email uživatela'
-            placeholder='Email uživatela'
-            registerReturn={register("email", { required: "Uživatel musí obsahovať email." })}
-            error={errors?.email}
          />
          <Input
             label='Popis uživatela'
@@ -137,6 +137,24 @@ const UserForm: React.FC = () => {
                   registerReturn={register("roleHistory", { minLength: 1 })}
                   setError={setError}
                   error={errors?.roleHistory}
+                  onChange={onChange}
+               />
+            )}
+         />
+         <Controller
+            name="membershipHistory"
+            control={control}
+            rules={{ minLength: 1 }}
+            render={({ field: { onChange, value } }) => (
+               <MultiSelect
+                  label='Membership'
+                  selectedOptions={value}
+                  options={userOptions}
+                  isLoading={usersIsFetching}
+                  fetchMoreData={usersFetchNextPage}
+                  registerReturn={register("membershipHistory", { minLength: 1 })}
+                  setError={setError}
+                  error={errors?.membershipHistory}
                   onChange={onChange}
                />
             )}

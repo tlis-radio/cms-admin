@@ -1,8 +1,9 @@
 import { Pagination, PaginationDto } from "@/models/pagination";
-import { CreateShowDto, Show, ShowDto, UpdateShowDto } from "@/models/show";
+import { Show } from "@/models/show";
 import { UserBasicInformations } from "@/models/user/user-basic-informations";
 import { UserDetails } from "@/models/user/user-details";
-import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateActiveUserDto, CreateArchiveUserDto } from "@/types/user";
+import { CreateShowDto, ShowDto, UpdateShowDto } from "@/types/show";
+import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateUserDto } from "@/types/user";
 
 const getAsync = async <T>(uri: string) : Promise<T> =>
 {
@@ -99,11 +100,8 @@ const userEndpoints = {
 
         return UserDetails.fromDto(id, result);
     },
-    CreateNewActiveAsync: async (dto: CreateActiveUserDto) : Promise<void> => {
+    CreateNewActiveAsync: async (dto: CreateUserDto) : Promise<void> => {
         await postAsync("/api/user-management", dto);
-    },
-    CreateNewArchiveAsync: async (dto: CreateArchiveUserDto) : Promise<void> => {
-        await postAsync("/api/user-management/archive", dto);
     },
     UpdateAsync: async (id: string, dto: UpdateUserDto) : Promise<void> => {
         await putAsync(`/api/user-management/${id}`, dto);
