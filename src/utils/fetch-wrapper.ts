@@ -33,7 +33,7 @@ export const fetchPost = async (props: fetchPost) => {
 
     return callFetch({
         path: props.path,
-        method: "PUT",
+        method: "POST",
         body: props.body,
         accessToken
     });

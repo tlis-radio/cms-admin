@@ -40,7 +40,7 @@ const Users: FunctionComponent = () => {
         <PaginationTable
             title='Uživatelia'
             tableHeadings={tableHeadings}
-            queryKey='showsPage'
+            queryKey='usersPage'
             queryFn={CmsApiService.User.PaginationAsync}
             dataToRowTransformationFn={dataToRowTransformationFn}
             maxRows={4}
