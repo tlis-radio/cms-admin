@@ -28,7 +28,7 @@ const UserForm: React.FC = () => {
    const searchParams = useSearchParams();
    const id = searchParams.get('id');
    const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<UserFormValues>({
-      defaultValues: { firstname: "", lastname: "", nickname: "", preferNicknameOverName: true , abouth: "", email: "", roleHistory: [], membershipHistory: [] }
+      defaultValues: { firstname: "", lastname: "", nickname: "", preferNicknameOverName: true, abouth: "", email: "", roleHistory: [], membershipHistory: [] }
    });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
@@ -53,8 +53,8 @@ const UserForm: React.FC = () => {
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
-         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name }}));
-         setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status }} ));
+         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name } }));
+         setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status } }));
       }
    }, [userData, setValue, userOptions]);
 
@@ -78,8 +78,23 @@ const UserForm: React.FC = () => {
          password: data.password,
          preferNicknameOverName: data.preferNicknameOverName,
          abouth: data.abouth,
-         roleHistory: data.roleHistory?.map((m) => { return m.id, m.value }),
-         membershipHistory: data.membershipHistory?.map((membership) => { return membership.id, membership.value })
+         roleHistory: data.roleHistory?.map((m) => ({
+            functionEndDate: null,
+            functionStartDate: "",
+            role: {
+               id: m.id,
+               name: m.value
+            },
+            description: ""
+         })) || [],
+         membershipHistory: data.membershipHistory?.map((m) => ({
+            membership: {
+               id: m.id,
+               status: m.value
+            },
+            description: "",
+            changeDate: ""
+         }))
       });
    };
 
@@ -94,8 +109,8 @@ const UserForm: React.FC = () => {
          createFn={createFn}
       >
          <Input
-            label='Prezívka uživatela'
-            placeholder='Prezívka uživatela'
+            label='Prezývka uživatela'
+            placeholder='Prezývka uživatela'
             registerReturn={register("nickname", { required: "Uživatel musí obsahovať prezívkú." })}
             error={errors?.nickname}
          />
@@ -104,7 +119,7 @@ const UserForm: React.FC = () => {
             placeholder='Email uživatela'
             registerReturn={register("email", { required: "Uživatel musí obsahovať email." })}
             error={errors?.email}
-            />
+         />
          <Input
             label='Meno uživatela'
             placeholder='Meno uživatela'

@@ -11,7 +11,7 @@ type FormProps = {
     isLoading: boolean,
     isUpdate: boolean,
     otherServerError?: unknown;
-    handleSubmit: UseFormHandleSubmit<any, undefined>,
+    handleSubmit: UseFormHandleSubmit<any>,
     updateFn: (data: any) => Promise<void>,
     createFn: (data: any) => Promise<void>
 };
