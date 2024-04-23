@@ -6,14 +6,9 @@ export class UserBasicInformations
     public firstname: string;
     public lastname: string;
     public nickname: string;
-    public isActive: boolean;
     public email: string;
-    public roleHistory: Array<{
-        role: {
-            id: string; 
-            name: string; 
-        }
-    }>;
+    public roles: Array<string>;
+    public status: string;
 
     constructor(
         id: string,
@@ -21,21 +16,16 @@ export class UserBasicInformations
         lastname: string,
         nickname: string,
         email: string,
-        isActive: boolean,
-        roleHistory: Array<{
-            role:{ 
-                id: string;
-                name: string; 
-            }
-        }>
+        roles: Array<string>,
+        status: string
     ) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.nickname = nickname;
         this.email = email;
-        this.isActive = isActive;
-        this.roleHistory = roleHistory;
+        this.roles = roles;
+        this.status = status;
     }
 
     public static fromDto(dto: PaginationUserDto): UserBasicInformations
@@ -46,8 +36,8 @@ export class UserBasicInformations
             dto.lastname,
             dto.nickname,
             dto.email,
-            dto.isActive,
-            dto.roleHistory
+            dto.roles,
+            dto.status
         );
     }
 }

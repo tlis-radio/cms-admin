@@ -13,7 +13,7 @@ import { UserBasicInformations } from '@/models/user/user-basic-informations';
 
 const phoneTableHeadings = ['Meno','Priezvisko','Prezývka',''];
 const normalScreenTableHeadings = ['Meno','Priezvisko','Prezývka','E-mail',''];
-const wideScreenTableHeadings = ['Meno','Priezvisko','Prezývka','E-mail','Membership','Role',''];
+const wideScreenTableHeadings = ['Meno','Priezvisko','Prezývka','E-mail','Role', 'Status',''];
 
 const Users: FunctionComponent = () => {
     const router = useRouter();
@@ -63,7 +63,7 @@ const Users: FunctionComponent = () => {
                 if (screenType === 'normal') {
                     additionalData = [user.email];
                 } else if (screenType === 'wide') {
-                    additionalData = [user.email, user.nickname, user.nickname];
+                    additionalData = [user.email, user.roles.join(', '), user.status];
                 }
 
                 return [...commonData, ...additionalData, 

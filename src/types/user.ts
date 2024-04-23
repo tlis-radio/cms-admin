@@ -23,8 +23,8 @@ export type PaginationUserDto = {
     lastname: string;
     nickname: string;
     email: string;
-    isActive: boolean;
-    roleHistory: Array<UserRoleHistoryDto>;
+    roles: Array<string>;
+    status: string;
 }
 
 export type GetByIdUserDto = {
