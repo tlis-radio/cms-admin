@@ -34,6 +34,9 @@ const UserForm: React.FC = () => {
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
       { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null });
 
+   const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
+      { queryKey: ['roles'], queryFn: () => CmsApiService.User.GetRolesAsync(), staleTime: Infinity });
+
    const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
       queryKey: ['users'],
       queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
@@ -43,6 +46,10 @@ const UserForm: React.FC = () => {
    const userOptions = useMemo<Array<MultiSelectData>>(() => {
       return usersData?.pages.map((page) =>
          page.results.map((user): MultiSelectData => { return { id: user.id, value: user.nickname ?? "" } })).flat() ?? [];
+   }, [usersData]);
+
+   const roleOptions = useMemo<Array<MultiSelectData>>(() => {
+      return rolesData?.results.map<MultiSelectData>((role) => { return { id: role.id, value: role.name } }) ?? []
    }, [usersData]);
 
    useEffect(() => {
@@ -146,9 +153,8 @@ const UserForm: React.FC = () => {
                <MultiSelect
                   label='Role'
                   selectedOptions={value}
-                  options={userOptions}
-                  isLoading={usersIsFetching}
-                  fetchMoreData={usersFetchNextPage}
+                  options={roleOptions}
+                  isLoading={rolesIsFetching}
                   registerReturn={register("roleHistory", { minLength: 1 })}
                   setError={setError}
                   error={errors?.roleHistory}
