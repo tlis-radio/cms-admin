@@ -2,6 +2,7 @@ import { Pagination, PaginationDto } from "@/models/pagination";
 import { Show } from "@/models/show";
 import { UserBasicInformations } from "@/models/user/user-basic-informations";
 import { UserDetails } from "@/models/user/user-details";
+import { AllMemberships } from "@/types/membership";
 import { AllRoles } from "@/types/role";
 import { CreateShowDto, ShowDto, UpdateShowDto } from "@/types/show";
 import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateUserDto } from "@/types/user";
@@ -109,6 +110,9 @@ const userEndpoints = {
     },
     GetRolesAsync: async () : Promise<AllRoles> => {
         return await getAsync<AllRoles>("/api/user-management/all-roles");
+    },
+    GetMembershipsAsync: async () : Promise<AllMemberships> => {
+        return await getAsync<AllRoles>("/api/user-management/all-memberships");
     }
 };
 

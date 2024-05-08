@@ -37,6 +37,9 @@ const UserForm: React.FC = () => {
    const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
       { queryKey: ['roles'], queryFn: () => CmsApiService.User.GetRolesAsync(), staleTime: Infinity });
 
+   const { data: membershipsData, isFetching: membershipsIsFetching, error: membershipsError } = useQuery(
+      { queryKey: ['memberships'], queryFn: () => CmsApiService.User.GetMembershipsAsync(), staleTime: Infinity });
+
    const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
       queryKey: ['users'],
       queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
@@ -51,6 +54,10 @@ const UserForm: React.FC = () => {
    const roleOptions = useMemo<Array<MultiSelectData>>(() => {
       return rolesData?.results.map<MultiSelectData>((role) => { return { id: role.id, value: role.name } }) ?? []
    }, [usersData]);
+
+   const membershipOptions = useMemo<Array<MultiSelectData>>(() => {
+      return membershipsData?.results.map<MultiSelectData>((membership) => { return { id: membership.id, value: membership.name } }) ?? []
+   }, [membershipsData]);
 
    useEffect(() => {
       if (userData) {
@@ -110,7 +117,7 @@ const UserForm: React.FC = () => {
          title={id ? "Upraviť uživatela" : "Nový uživatel"}
          isLoading={id !== null && userIsFetching}
          isUpdate={id !== null}
-         otherServerError={userError}
+         otherServerError={userError || rolesError || membershipsError}
          handleSubmit={handleSubmit}
          updateFn={updateFn}
          createFn={createFn}
@@ -170,9 +177,8 @@ const UserForm: React.FC = () => {
                <MultiSelect
                   label='Membership'
                   selectedOptions={value}
-                  options={userOptions}
-                  isLoading={usersIsFetching}
-                  fetchMoreData={usersFetchNextPage}
+                  options={membershipOptions}
+                  isLoading={membershipsIsFetching}
                   registerReturn={register("membershipHistory", { minLength: 1 })}
                   setError={setError}
                   error={errors?.membershipHistory}
