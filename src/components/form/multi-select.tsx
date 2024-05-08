@@ -78,7 +78,7 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
                     >
                         <Listbox.Options
                             onScroll={(e) => memorizedOnScroll(e.target as HTMLElement)}
-                            className="absolute mt-1 max-h-60 w-full overflow-auto bg-white shadow appearance-none border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                            className="absolute mt-1 max-h-60 z-10 w-full overflow-auto bg-white shadow appearance-none border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
                         >
                             {options.map((option) => (
                                 <Listbox.Option

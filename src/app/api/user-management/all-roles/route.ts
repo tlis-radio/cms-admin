@@ -3,5 +3,5 @@ import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { NextRequest } from "next/server";
 
 export const GET = withApiAuthRequired(
-  async (request: NextRequest) => fetchGet({ path: `usermanagement/Role` })
+  async (request: NextRequest) => fetchGet({ path: `usermanagement/Role`, isAuthorized: true })
 );
