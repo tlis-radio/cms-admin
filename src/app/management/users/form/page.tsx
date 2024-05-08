@@ -1,14 +1,20 @@
 'use client';
 
 import Input from '@/components/form/input';
-import MultiSelect, { MultiSelectData } from '@/components/form/multi-select';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
+import Accordeon from '@/components/accordeon';
+import AccordeonSegment from '@/components/accordeon/accordeon-segment';
+import Section from '@/components/form/section';
+import Select, { SelectData } from '@/components/form/select';
+import { DevTool } from "@hookform/devtools";
+import Button from '@/components/button';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 type UserFormValues = {
    firstname: string;
@@ -18,8 +24,8 @@ type UserFormValues = {
    abouth: string;
    email: string | null;
    password: string;
-   roleHistory: Array<MultiSelectData>;
-   membershipHistory: Array<MultiSelectData>;
+   roleHistory: Array<{ role: SelectData }>;
+   membershipHistory: Array<{ membership: SelectData }>;
 };
 
 const limit = 10;
@@ -30,6 +36,8 @@ const UserForm: React.FC = () => {
    const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<UserFormValues>({
       defaultValues: { firstname: "", lastname: "", nickname: "", preferNicknameOverName: true, abouth: "", email: "", roleHistory: [], membershipHistory: [] }
    });
+   const { fields: roleHistoryFields, append: appendRoleHistory, remove: removeRoleHistory, update: updateRoleHistory } = useFieldArray({ control, name: "roleHistory" });
+   const { fields: membershipHistoryFields, append: appendMembershipHistory, remove: removeMembershipHistory, update: updateMembershipHistory } = useFieldArray({ control, name: "membershipHistory" });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
       { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null });
@@ -46,17 +54,17 @@ const UserForm: React.FC = () => {
       getNextPageParam: (lastPage) => lastPage.totalPages == lastPage.page ? undefined : lastPage.page + 1
    });
 
-   const userOptions = useMemo<Array<MultiSelectData>>(() => {
+   const userOptions = useMemo<Array<SelectData>>(() => {
       return usersData?.pages.map((page) =>
-         page.results.map((user): MultiSelectData => { return { id: user.id, value: user.nickname ?? "" } })).flat() ?? [];
+         page.results.map((user): SelectData => { return { id: user.id, value: user.nickname ?? "" } })).flat() ?? [];
    }, [usersData]);
 
-   const roleOptions = useMemo<Array<MultiSelectData>>(() => {
-      return rolesData?.results.map<MultiSelectData>((role) => { return { id: role.id, value: role.name } }) ?? []
+   const roleOptions = useMemo<Array<SelectData>>(() => {
+      return rolesData?.results.map<SelectData>((role) => { return { id: role.id, value: role.name } }) ?? []
    }, [usersData]);
 
-   const membershipOptions = useMemo<Array<MultiSelectData>>(() => {
-      return membershipsData?.results.map<MultiSelectData>((membership) => { return { id: membership.id, value: membership.name } }) ?? []
+   const membershipOptions = useMemo<Array<SelectData>>(() => {
+      return membershipsData?.results.map<SelectData>((membership) => { return { id: membership.id, value: membership.name } }) ?? []
    }, [membershipsData]);
 
    useEffect(() => {
@@ -67,8 +75,9 @@ const UserForm: React.FC = () => {
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
-         setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name } }));
-         setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status } }));
+         // TODO:
+         // setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name } }));
+         // setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status } }));
       }
    }, [userData, setValue, userOptions]);
 
@@ -96,15 +105,15 @@ const UserForm: React.FC = () => {
             functionEndDate: null,
             functionStartDate: "",
             role: {
-               id: m.id,
-               name: m.value
+               id: m.role.id,
+               name: m.role.value
             },
             description: ""
          })) || [],
          membershipHistory: data.membershipHistory?.map((m) => ({
             membership: {
-               id: m.id,
-               status: m.value
+               id: m.membership.id,
+               status: m.membership.value
             },
             description: "",
             changeDate: ""
@@ -152,40 +161,61 @@ const UserForm: React.FC = () => {
             registerReturn={register("abouth", { required: "Uživatel musí obsahovať popis." })}
             error={errors?.abouth}
          />
-         <Controller
-            name="roleHistory"
-            control={control}
-            rules={{ minLength: 1 }}
-            render={({ field: { onChange, value } }) => (
-               <MultiSelect
-                  label='Role'
-                  selectedOptions={value}
-                  options={roleOptions}
-                  isLoading={rolesIsFetching}
-                  registerReturn={register("roleHistory", { minLength: 1 })}
-                  setError={setError}
-                  error={errors?.roleHistory}
-                  onChange={onChange}
-               />
-            )}
-         />
-         <Controller
-            name="membershipHistory"
-            control={control}
-            rules={{ minLength: 1 }}
-            render={({ field: { onChange, value } }) => (
-               <MultiSelect
-                  label='Membership'
-                  selectedOptions={value}
-                  options={membershipOptions}
-                  isLoading={membershipsIsFetching}
-                  registerReturn={register("membershipHistory", { minLength: 1 })}
-                  setError={setError}
-                  error={errors?.membershipHistory}
-                  onChange={onChange}
-               />
-            )}
-         />
+         <Section title='Role History'>
+            <Button
+               onClick={() => { appendRoleHistory({ role: { id: "", value: "" } })}}
+               icon={faPlus}
+            />
+            <Accordeon>
+               {roleHistoryFields.map((field, index) => (
+                  <AccordeonSegment title="Datum od do" key={index}>
+                     <Controller
+                        name={`roleHistory.${index}.role`}
+                        control={control}
+                        rules={{ minLength: 1 }}
+                        render={({ field: { onChange, value } }) => (
+                           <Select
+                              label='Role'
+                              selectedOption={value}
+                              options={roleOptions}
+                              isLoading={rolesIsFetching}
+                              error={errors?.roleHistory}
+                              onChange={onChange}
+                           />
+                        )}
+                     />
+                  </AccordeonSegment>
+               ))}
+            </Accordeon>
+         </Section>
+         <Section title='Membership History'>
+            <Button
+               onClick={() => { appendMembershipHistory({ membership: { id: "", value: "" } })}}
+               icon={faPlus}
+            />
+            <Accordeon>
+               {membershipHistoryFields.map((field, index) => (
+                  <AccordeonSegment title="Datum od do" key={index}>
+                     <Controller
+                        name={`membershipHistory.${index}.membership`}
+                        control={control}
+                        rules={{ minLength: 1 }}
+                        render={({ field: { onChange, value } }) => (
+                           <Select
+                              label='Membership'
+                              selectedOption={value}
+                              options={membershipOptions}
+                              isLoading={membershipsIsFetching}
+                              error={errors?.membershipHistory}
+                              onChange={onChange}
+                           />
+                        )}
+                     />
+                  </AccordeonSegment>
+               ))}
+            </Accordeon>
+         </Section>
+         <DevTool control={control} /> {/* set up the dev tool */}
       </Form>
    );
 };

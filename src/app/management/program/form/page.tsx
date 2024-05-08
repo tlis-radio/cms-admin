@@ -1,7 +1,7 @@
 'use client';
 
 import Input from '@/components/form/input';
-import MultiSelect, { MultiSelectData } from '@/components/form/multi-select';
+import Select, { MultiSelectData } from '@/components/form/multi-select';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
@@ -92,7 +92,7 @@ const ShowForm: React.FC = () => {
                 control={control}
                 rules={{ minLength: 1 }}
                 render={({ field: { onChange, value } }) => (
-                    <MultiSelect
+                    <Select
                         label='Moderátori'
                         selectedOptions={value}
                         options={userOptions}

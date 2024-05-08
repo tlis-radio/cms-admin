@@ -7,31 +7,27 @@ import { faGear, faArrowsUpDown, faSquareCheck } from '@fortawesome/free-solid-s
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FetchNextPageOptions } from '@tanstack/react-query';
 
-export type MultiSelectData = {
+export type SelectData = {
     id: string;
     value: string;
 }
 
-type MultiSelectProps = {
+type SelectProps = {
     label: string;
-    error: Merge<FieldError, FieldErrorsImpl<MultiSelectData>> | undefined;
-    selectedOptions: Array<MultiSelectData>;
-    options: Array<MultiSelectData>;
+    error: Merge<FieldError, FieldErrorsImpl<SelectData>> | undefined;
+    selectedOption: SelectData;
+    options: Array<SelectData>;
     isLoading: boolean;
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
-    setError: UseFormSetError<any>;
-    registerReturn: UseFormRegisterReturn;
-    onChange: (...event: any[]) => void;
+    onChange: (...event: any) => void;
 }
 
-const MultiSelect: FunctionComponent<MultiSelectProps> = ({
+const Select: FunctionComponent<SelectProps> = ({
     label,
     error,
     isLoading,
     fetchMoreData,
-    registerReturn,
-    setError,
-    selectedOptions,
+    selectedOption,
     options,
     onChange
 }): JSX.Element => {
@@ -49,24 +45,19 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
     //     }
     // }, [registerReturn, selectedOptions, setError, error]);
 
-    const getValues = (): MultiSelectData[] => {
-        return options.filter((option) => selectedOptions?.find(v => v.id == option.id));
-    };
+    
 
     return (
         <div className="flex flex-col gap-2 w-72">
             <InputLabel label={label}/>
             <Listbox
-                value={getValues()}
+                value={selectedOption}
                 onChange={onChange}
-                multiple
             >
                 <div className="relative mt-1">
                     <Listbox.Button className="flex flex-row w-full bg-white items-center rounded shadow border py-2 px-2 focus:outline-none focus:shadow-outline appearance-none">
                         <span className="relative w-full flex flex-wrap items-center text-left gap-2">
-                            {selectedOptions.map(x => (
-                                <span key={x.id} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{x.value}</span>
-                            ))}
+                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{selectedOption.value}</span>
                         </span>
                         <FontAwesomeIcon className="text-gray-400" icon={faArrowsUpDown} />
                     </Listbox.Button>
@@ -112,4 +103,4 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
     );
 };
 
-export default MultiSelect;
+export default Select;

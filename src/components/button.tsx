@@ -23,6 +23,7 @@ const Button: React.FC<ButtonProps> = ({ type, label, onClick, icon, disabled })
             className={`bg-${color}-500 text-white font-bold py-2 px-4 rounded ${disabled ? 'opacity-50 cursor-not-allowed' : `hover:bg-${color}-700 cursor-pointer`}}`}
             onClick={onClick}
             disabled={disabled}
+            type="button"
         >
             {icon && <FontAwesomeIcon icon={icon} /> }
             {label && label}
