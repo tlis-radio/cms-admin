@@ -19,7 +19,7 @@ type SelectProps = {
     options: Array<SelectData>;
     isLoading: boolean;
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
-    onChange: (...event: any) => void;
+    onChange: (event: SelectData) => void;
 }
 
 const Select: FunctionComponent<SelectProps> = ({

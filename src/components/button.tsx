@@ -2,7 +2,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ButtonProps = {
-    type?: "ADD"
+    type?: "ADD" | "DELETE";
     label?: string;
     icon?: IconDefinition,
     onClick: () => void;
@@ -15,6 +15,9 @@ const Button: React.FC<ButtonProps> = ({ type, label, onClick, icon, disabled })
     switch (type) {
         case "ADD":
             color = "emerald";
+            break;
+        case "DELETE":
+            color = "rose";
             break;
     };
     

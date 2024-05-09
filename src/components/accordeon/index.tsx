@@ -1,10 +1,14 @@
 import React from "react";
 
-const Accordeon: React.FC<React.PropsWithChildren> = ({ children }) => {
+type AccordeonProps = {
+    className?: string;
+};
+
+const Accordeon: React.FC<AccordeonProps & React.PropsWithChildren> = ({ children, className }) => {
     const childrenArray = Array.isArray(children) ? children : [children];
 
     return (
-        <div>
+        <div className={className}>
             {...childrenArray}
         </div>
     );

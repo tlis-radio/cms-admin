@@ -4,9 +4,9 @@ import Input from '@/components/form/input';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useMemo } from "react";
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
 import Accordeon from '@/components/accordeon';
 import AccordeonSegment from '@/components/accordeon/accordeon-segment';
@@ -14,7 +14,8 @@ import Section from '@/components/form/section';
 import Select, { SelectData } from '@/components/form/select';
 import { DevTool } from "@hookform/devtools";
 import Button from '@/components/button';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import DateInput from '@/components/form/date-input';
 
 type UserFormValues = {
    firstname: string;
@@ -24,11 +25,9 @@ type UserFormValues = {
    abouth: string;
    email: string | null;
    password: string;
-   roleHistory: Array<{ role: SelectData }>;
-   membershipHistory: Array<{ membership: SelectData }>;
+   roleHistory: Array<{ role: SelectData, functionStartDate: Date, functionEndDate?: Date }>;
+   membershipHistory: Array<{ membership: SelectData, changeDate: Date }>;
 };
-
-const limit = 10;
 
 const UserForm: React.FC = () => {
    const searchParams = useSearchParams();
@@ -48,20 +47,9 @@ const UserForm: React.FC = () => {
    const { data: membershipsData, isFetching: membershipsIsFetching, error: membershipsError } = useQuery(
       { queryKey: ['memberships'], queryFn: () => CmsApiService.User.GetMembershipsAsync(), staleTime: Infinity });
 
-   const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
-      queryKey: ['users'],
-      queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
-      getNextPageParam: (lastPage) => lastPage.totalPages == lastPage.page ? undefined : lastPage.page + 1
-   });
-
-   const userOptions = useMemo<Array<SelectData>>(() => {
-      return usersData?.pages.map((page) =>
-         page.results.map((user): SelectData => { return { id: user.id, value: user.nickname ?? "" } })).flat() ?? [];
-   }, [usersData]);
-
    const roleOptions = useMemo<Array<SelectData>>(() => {
       return rolesData?.results.map<SelectData>((role) => { return { id: role.id, value: role.name } }) ?? []
-   }, [usersData]);
+   }, [rolesData]);
 
    const membershipOptions = useMemo<Array<SelectData>>(() => {
       return membershipsData?.results.map<SelectData>((membership) => { return { id: membership.id, value: membership.name } }) ?? []
@@ -79,7 +67,7 @@ const UserForm: React.FC = () => {
          // setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name } }));
          // setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status } }));
       }
-   }, [userData, setValue, userOptions]);
+   }, [userData, setValue]);
 
    const updateFn = async (data: UserFormValues) => {
       if (!id) return;
@@ -101,22 +89,16 @@ const UserForm: React.FC = () => {
          password: data.password,
          preferNicknameOverName: data.preferNicknameOverName,
          abouth: data.abouth,
-         roleHistory: data.roleHistory?.map((m) => ({
-            functionEndDate: null,
-            functionStartDate: "",
-            role: {
-               id: m.role.id,
-               name: m.role.value
-            },
-            description: ""
-         })) || [],
-         membershipHistory: data.membershipHistory?.map((m) => ({
-            membership: {
-               id: m.membership.id,
-               status: m.membership.value
-            },
-            description: "",
-            changeDate: ""
+         roleHistory: data.roleHistory.map((m) => ({
+            functionEndDate: m.functionEndDate?.toISOString() ?? null,
+            functionStartDate: m.functionStartDate.toISOString(),
+            roleId: m.role.id,
+            description: "" // TODO: text area
+         })),
+         membershipHistory: data.membershipHistory.map((m) => ({
+            membershipId: m.membership.id,
+            description: "", // TODO: text area
+            changeDate: m.changeDate.toISOString()
          }))
       });
    };
@@ -161,61 +143,75 @@ const UserForm: React.FC = () => {
             registerReturn={register("abouth", { required: "Uživatel musí obsahovať popis." })}
             error={errors?.abouth}
          />
-         <Section title='Role History'>
-            <Button
-               onClick={() => { appendRoleHistory({ role: { id: "", value: "" } })}}
-               icon={faPlus}
-            />
+         <Section
+            title='Role History'
+            onAdd={() => { appendRoleHistory({ role: { id: "", value: "Empty" }, functionStartDate: new Date() }) }}
+         >
             <Accordeon>
                {roleHistoryFields.map((field, index) => (
-                  <AccordeonSegment title="Datum od do" key={index}>
-                     <Controller
-                        name={`roleHistory.${index}.role`}
-                        control={control}
-                        rules={{ minLength: 1 }}
-                        render={({ field: { onChange, value } }) => (
-                           <Select
-                              label='Role'
-                              selectedOption={value}
-                              options={roleOptions}
-                              isLoading={rolesIsFetching}
-                              error={errors?.roleHistory}
-                              onChange={onChange}
-                           />
-                        )}
+                  <AccordeonSegment title={field.role.value} key={index}>
+                     <DateInput
+                        label='Function Start Date'
+                        value={field.functionStartDate}
+                        onChange={(ev) => { console.log(roleHistoryFields); updateRoleHistory(index, { ...field, functionStartDate: ev })}}
                      />
+                     <DateInput
+                        label='Function End Date'
+                        value={field.functionEndDate}
+                        onChange={(ev) => updateRoleHistory(index, { ...field, functionEndDate: ev })}
+                        isClearable={true}
+                     />
+                     <Select
+                        label='Role'
+                        selectedOption={field.role}
+                        options={roleOptions}
+                        isLoading={rolesIsFetching}
+                        error={errors?.roleHistory}
+                        onChange={(ev) => updateRoleHistory(index, { ...field, role: ev })}
+                     />
+                     <span className='flex flex-row justify-end py-4'>
+                        <Button
+                           onClick={() => removeRoleHistory(index)}
+                           icon={faTrash}
+                           type='DELETE'
+                        />
+                     </span>
                   </AccordeonSegment>
                ))}
             </Accordeon>
          </Section>
-         <Section title='Membership History'>
-            <Button
-               onClick={() => { appendMembershipHistory({ membership: { id: "", value: "" } })}}
-               icon={faPlus}
-            />
+         <Section
+            title='Membership History'
+            onAdd={() => { appendMembershipHistory({ membership: { id: "", value: membershipOptions[0].value }, changeDate: new Date()})}}
+         >
             <Accordeon>
                {membershipHistoryFields.map((field, index) => (
-                  <AccordeonSegment title="Datum od do" key={index}>
-                     <Controller
-                        name={`membershipHistory.${index}.membership`}
-                        control={control}
-                        rules={{ minLength: 1 }}
-                        render={({ field: { onChange, value } }) => (
-                           <Select
-                              label='Membership'
-                              selectedOption={value}
-                              options={membershipOptions}
-                              isLoading={membershipsIsFetching}
-                              error={errors?.membershipHistory}
-                              onChange={onChange}
-                           />
-                        )}
+                  <AccordeonSegment title={field.membership.value} key={index}>
+                     <Select
+                        label='Membership'
+                        selectedOption={field.membership}
+                        options={membershipOptions}
+                        isLoading={membershipsIsFetching}
+                        error={errors?.membershipHistory}
+                        onChange={(ev) => updateMembershipHistory(index, { ...field, membership: ev })}
                      />
+                     <DateInput
+                        label='Change Date'
+                        value={field.changeDate}
+                        onChange={(ev) => updateMembershipHistory(index, { ...field, changeDate: ev })}
+                     />
+                     <span className='flex flex-row justify-end py-4'>
+                        <Button
+                           onClick={() => removeMembershipHistory(index)}
+                           icon={faTrash}
+                           type='DELETE'
+                        />
+                     </span>
                   </AccordeonSegment>
                ))}
             </Accordeon>
          </Section>
-         <DevTool control={control} /> {/* set up the dev tool */}
+         <DevTool control={control} />
       </Form>
    );
 };

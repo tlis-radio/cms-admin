@@ -9,5 +9,9 @@ const config: Config = {
   theme: {
   },
   plugins: [],
+  safelist: [
+    'bg-emerald-500',
+    'bg-rose-500',
+  ]
 }
 export default config

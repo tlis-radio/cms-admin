@@ -2,6 +2,8 @@
 import Navbar from '@/components/navbar';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
+import "react-datepicker/dist/react-datepicker.css";
+
 const ManagementLayout = ({ children, }: { children: React.ReactNode }) => {
   return (
     <>

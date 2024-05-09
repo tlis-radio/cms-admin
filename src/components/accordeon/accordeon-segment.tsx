@@ -5,11 +5,13 @@ import { Transition } from "@headlessui/react";
 
 type AccordeonSegmentProps = {
     title: string;
+    className?: string;
 };
 
 const AccordeonSegment: React.FC<AccordeonSegmentProps & React.PropsWithChildren> = ({
     title,
-    children
+    children,
+    className
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -18,7 +20,7 @@ const AccordeonSegment: React.FC<AccordeonSegmentProps & React.PropsWithChildren
     };
 
     return (
-        <div>
+        <div className={className}>
             <div
                 className="w-full border cursor-pointer text-white bg-slate-500 rounded-t-md px-4 py-2"
                 onClick={toggle}
@@ -34,7 +36,7 @@ const AccordeonSegment: React.FC<AccordeonSegmentProps & React.PropsWithChildren
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
             >
-                <div className="w-full border rounded-b-md px-4 py-2">
+                <div className="w-full border rounded-b-md px-4 py-2 flex flex-col gap-4">
                     { children }
                 </div>
             </Transition>

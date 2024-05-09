@@ -44,20 +44,12 @@ export type GetByIdUserDto = {
 export type UserRoleHistoryDto = {
     functionEndDate: string | null;
     functionStartDate: string;
-    role: { 
-        id: string;
-        name: string; 
-    }
+    roleId: string; 
     description: string | null;
 };
 
 export type UserMembershipHistoryDto = {
-    membership: MembershipDto;
+    membershipId: string;
     description: string | null;
     changeDate: string;
-};
-
-export type MembershipDto = {
-    id: string;
-    status: string;
 };
