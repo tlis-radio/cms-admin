@@ -4,5 +4,5 @@ export type AllMemberships = {
 
 export type Membership = {
     id: string;
-    name: string;
+    status: string;
 };

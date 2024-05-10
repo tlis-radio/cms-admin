@@ -13,8 +13,8 @@ export class UserDetails
     public externalId: string | null;
     public email: string | null;
     public roleHistory: Array<{
-        functionEndDate: string | null;
-        functionStartDate: string;
+        functionEndDate: Date | null;
+        functionStartDate: Date;
         description: string | null;
         role: { 
             id: string;
@@ -23,7 +23,7 @@ export class UserDetails
     }>;
     public membershipHistory: Array<{
         description: string | null;
-        changeDate: string;
+        changeDate: Date;
         membership: {
             id: string;
             status: string;
@@ -69,8 +69,21 @@ export class UserDetails
         this.profileImageId = profileImageId;
         this.preferNicknameOverName = preferNicknameOverName;
         this.externalId = externalId;
-        this.roleHistory = roleHistory;
-        this.membershipHistory = membershipHistory;
+        this.roleHistory = roleHistory.map((history) => {
+            return {
+                functionEndDate: history.functionEndDate ? new Date(history.functionEndDate) : null,
+                functionStartDate: new Date(history.functionStartDate),
+                description: history.description,
+                role: { id: history.role.id, name: history.role.name }
+            }
+        });
+        this.membershipHistory = membershipHistory.map((history) => {
+            return {
+                changeDate: new Date(history.changeDate),
+                description: history.description,
+                membership: { id: history.membership.id, status: history.membership.status }
+            }
+        });
     }
 
     public static fromDto(id: string, dto: GetByIdUserDto): UserDetails

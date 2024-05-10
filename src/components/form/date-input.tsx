@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 
 type DateInputProps = {
     label: string;
-    value: Date | undefined;
+    value: Date | null;
     onChange: (event: Date) => void;
     isClearable?: boolean;
     dateFormat?: string;

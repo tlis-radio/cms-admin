@@ -1,3 +1,6 @@
+import { Role } from "./role";
+import { Membership } from "./membership";
+
 export type CreateUserDto = {
     firstname: string,
     lastname: string,
@@ -6,8 +9,21 @@ export type CreateUserDto = {
     abouth: string,
     email: string | null,
     password: string,
-    roleHistory: Array<UserRoleHistoryDto>;
-    membershipHistory: Array<UserMembershipHistoryDto>;
+    roleHistory: Array<CreateUserDtoRoleHistory>;
+    membershipHistory: Array<CreateUserDtoMembershipHistory>;
+};
+
+export type CreateUserDtoRoleHistory = {
+    functionEndDate: string | null;
+    functionStartDate: string;
+    roleId: string; 
+    description: string | null;
+};
+
+export type CreateUserDtoMembershipHistory = {
+    membershipId: string;
+    description: string | null;
+    changeDate: string;
 };
 
 export type UpdateUserDto = {
@@ -37,19 +53,19 @@ export type GetByIdUserDto = {
     preferNicknameOverName: boolean;
     externalId: string | null;
     email: string | null;
-    roleHistory: Array<UserRoleHistoryDto>;
-    membershipHistory: Array<UserMembershipHistoryDto>;
+    roleHistory: Array<GetByIdUserDtoRoleHistory>;
+    membershipHistory: Array<UserMembershipHistoryDtoMembershipHistory>;
 };
 
-export type UserRoleHistoryDto = {
+export type GetByIdUserDtoRoleHistory = {
     functionEndDate: string | null;
     functionStartDate: string;
-    roleId: string; 
+    role: Role; 
     description: string | null;
 };
 
-export type UserMembershipHistoryDto = {
-    membershipId: string;
+export type UserMembershipHistoryDtoMembershipHistory = {
+    membership: Membership;
     description: string | null;
     changeDate: string;
 };

@@ -112,7 +112,7 @@ const userEndpoints = {
         return await getAsync<AllRoles>("/api/user-management/all-roles");
     },
     GetMembershipsAsync: async () : Promise<AllMemberships> => {
-        return await getAsync<AllRoles>("/api/user-management/all-memberships");
+        return await getAsync<AllMemberships>("/api/user-management/all-memberships");
     }
 };
 

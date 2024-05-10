@@ -25,7 +25,7 @@ type UserFormValues = {
    abouth: string;
    email: string | null;
    password: string;
-   roleHistory: Array<{ role: SelectData, functionStartDate: Date, functionEndDate?: Date }>;
+   roleHistory: Array<{ role: SelectData, functionStartDate: Date, functionEndDate: Date | null }>;
    membershipHistory: Array<{ membership: SelectData, changeDate: Date }>;
 };
 
@@ -52,7 +52,7 @@ const UserForm: React.FC = () => {
    }, [rolesData]);
 
    const membershipOptions = useMemo<Array<SelectData>>(() => {
-      return membershipsData?.results.map<SelectData>((membership) => { return { id: membership.id, value: membership.name } }) ?? []
+      return membershipsData?.results.map<SelectData>((membership) => { return { id: membership.id, value: membership.status } }) ?? []
    }, [membershipsData]);
 
    useEffect(() => {
@@ -63,9 +63,19 @@ const UserForm: React.FC = () => {
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
-         // TODO:
-         // setValue("roleHistory", userData.roleHistory.map((m) => { return { id: m.role.id, value: m.role.name } }));
-         // setValue("membershipHistory", userData.membershipHistory.map((m) => { return { id: m.membership.id, value: m.membership.status } }));
+         setValue("roleHistory", userData.roleHistory.map((m) => {
+            return { 
+               functionStartDate: m.functionStartDate,
+               functionEndDate: m.functionEndDate,
+               role: { id: m.role.id, value: m.role.name }
+            }
+         }));
+         setValue("membershipHistory", userData.membershipHistory.map((m) => {
+            return {
+               changeDate: m.changeDate,
+               membership: { id: m.membership.id, value: m.membership.status }
+            }
+         }));
       }
    }, [userData, setValue]);
 
@@ -145,7 +155,7 @@ const UserForm: React.FC = () => {
          />
          <Section
             title='Role History'
-            onAdd={() => { appendRoleHistory({ role: { id: "", value: "Empty" }, functionStartDate: new Date() }) }}
+            onAdd={() => { appendRoleHistory({ role: { id: "", value: "Empty" }, functionStartDate: new Date(), functionEndDate: null }) }}
          >
             <Accordeon>
                {roleHistoryFields.map((field, index) => (
