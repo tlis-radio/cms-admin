@@ -25,8 +25,8 @@ type UserFormValues = {
    abouth: string;
    email: string | null;
    password: string;
-   roleHistory: Array<{ role: SelectData, functionStartDate: Date, functionEndDate: Date | null }>;
-   membershipHistory: Array<{ membership: SelectData, changeDate: Date }>;
+   roleHistory: Array<{ historyId: string | null, role: SelectData, functionStartDate: Date, functionEndDate: Date | null }>;
+   membershipHistory: Array<{ historyId: string | null, membership: SelectData, changeDate: Date }>;
 };
 
 const UserForm: React.FC = () => {
@@ -39,7 +39,7 @@ const UserForm: React.FC = () => {
    const { fields: membershipHistoryFields, append: appendMembershipHistory, remove: removeMembershipHistory, update: updateMembershipHistory } = useFieldArray({ control, name: "membershipHistory" });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
-      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null });
+      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: 0 });
 
    const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
       { queryKey: ['roles'], queryFn: () => CmsApiService.User.GetRolesAsync(), staleTime: Infinity });
@@ -65,6 +65,7 @@ const UserForm: React.FC = () => {
          setValue("email", userData.email);
          setValue("roleHistory", userData.roleHistory.map((m) => {
             return { 
+               historyId: m.id,
                functionStartDate: m.functionStartDate,
                functionEndDate: m.functionEndDate,
                role: { id: m.role.id, value: m.role.name }
@@ -72,6 +73,7 @@ const UserForm: React.FC = () => {
          }));
          setValue("membershipHistory", userData.membershipHistory.map((m) => {
             return {
+               historyId: m.id,
                changeDate: m.changeDate,
                membership: { id: m.membership.id, value: m.membership.status }
             }
@@ -80,13 +82,27 @@ const UserForm: React.FC = () => {
    }, [userData, setValue]);
 
    const updateFn = async (data: UserFormValues) => {
-      if (!id) return;
+      if (!id || !userData) return;
 
       return CmsApiService.User.UpdateAsync(id, {
          firstname: data.firstname,
          lastname: data.lastname,
          nickname: data.nickname,
-         abouth: data.abouth
+         abouth: data.abouth,
+         preferNicknameOverName: true,
+         membershipHistory: data.membershipHistory.map((m) => ({
+            id: m.historyId,
+            membershipId: m.membership.id,
+            description: "", // TODO: text area
+            changeDate: m.changeDate.toISOString(),
+         })),
+         roleHistory: data.roleHistory.map((m) => ({
+            id: m.historyId,
+            roleId: m.role.id,
+            description: "", // TODO: text area
+            functionEndDate: m.functionEndDate?.toISOString() ?? null,
+            functionStartDate: m.functionStartDate.toISOString(),
+         }))
       });
    };
 
@@ -155,7 +171,7 @@ const UserForm: React.FC = () => {
          />
          <Section
             title='Role History'
-            onAdd={() => { appendRoleHistory({ role: { id: "", value: "Empty" }, functionStartDate: new Date(), functionEndDate: null }) }}
+            onAdd={() => { appendRoleHistory({ historyId: null, role: { id: "", value: "Empty" }, functionStartDate: new Date(), functionEndDate: null }) }}
          >
             <Accordeon>
                {roleHistoryFields.map((field, index) => (
@@ -163,7 +179,7 @@ const UserForm: React.FC = () => {
                      <DateInput
                         label='Function Start Date'
                         value={field.functionStartDate}
-                        onChange={(ev) => { console.log(roleHistoryFields); updateRoleHistory(index, { ...field, functionStartDate: ev })}}
+                        onChange={(ev) => { updateRoleHistory(index, { ...field, functionStartDate: ev })}}
                      />
                      <DateInput
                         label='Function End Date'
@@ -192,7 +208,7 @@ const UserForm: React.FC = () => {
          </Section>
          <Section
             title='Membership History'
-            onAdd={() => { appendMembershipHistory({ membership: { id: "", value: membershipOptions[0].value }, changeDate: new Date()})}}
+            onAdd={() => { appendMembershipHistory({ historyId: null, membership: { id: "", value: membershipOptions[0].value }, changeDate: new Date()})}}
          >
             <Accordeon>
                {membershipHistoryFields.map((field, index) => (

@@ -2,11 +2,24 @@ import { getAccessToken } from "@auth0/nextjs-auth0";
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "process";
 
+type fetchDelete = {
+    path: string;
+}
+
+export const fetchDelete = async (props: fetchDelete) => {
+    const { accessToken } = await getAccessToken();
+
+    return callFetch({
+        path: props.path,
+        method: "DELETE",
+        accessToken
+    });
+}
+
 type fetchGet = {
     path: string;
     isAuthorized?: boolean
 };
-
 
 export const fetchGet = async (props: fetchGet) => {
     if (props.isAuthorized)

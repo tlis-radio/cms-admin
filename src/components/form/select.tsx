@@ -20,6 +20,7 @@ type SelectProps = {
     isLoading: boolean;
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
     onChange: (event: SelectData) => void;
+    disabled?: boolean;
 }
 
 const Select: FunctionComponent<SelectProps> = ({
@@ -29,6 +30,7 @@ const Select: FunctionComponent<SelectProps> = ({
     fetchMoreData,
     selectedOption,
     options,
+    disabled,
     onChange
 }): JSX.Element => {
     const memorizedOnScroll = useCallback(async (target: HTMLElement) => {
@@ -53,9 +55,10 @@ const Select: FunctionComponent<SelectProps> = ({
             <Listbox
                 value={selectedOption}
                 onChange={onChange}
+                disabled={disabled}
             >
                 <div className="relative mt-1">
-                    <Listbox.Button className="flex flex-row w-full bg-white items-center rounded shadow border py-2 px-2 focus:outline-none focus:shadow-outline appearance-none">
+                    <Listbox.Button className="flex flex-row w-full bg-white items-center rounded shadow border py-2 px-2 focus:outline-none focus:shadow-outline appearance-none disabled:bg-slate-300">
                         <span className="relative w-full flex flex-wrap items-center text-left gap-2">
                             <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{selectedOption.value}</span>
                         </span>

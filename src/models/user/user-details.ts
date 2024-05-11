@@ -13,6 +13,7 @@ export class UserDetails
     public externalId: string | null;
     public email: string | null;
     public roleHistory: Array<{
+        id: string | null;
         functionEndDate: Date | null;
         functionStartDate: Date;
         description: string | null;
@@ -22,6 +23,7 @@ export class UserDetails
         }
     }>;
     public membershipHistory: Array<{
+        id : string | null;
         description: string | null;
         changeDate: Date;
         membership: {
@@ -42,6 +44,7 @@ export class UserDetails
         preferNicknameOverName: boolean,
         externalId: string | null,
         roleHistory: Array<{
+            id: string | null;
             functionEndDate: string | null;
             functionStartDate: string;
             description: string | null;
@@ -51,6 +54,7 @@ export class UserDetails
             }
         }>,
         membershipHistory: Array<{
+            id: string | null;
             description: string | null;
             changeDate: string;
             membership: {
@@ -71,6 +75,7 @@ export class UserDetails
         this.externalId = externalId;
         this.roleHistory = roleHistory.map((history) => {
             return {
+                id: history.id,
                 functionEndDate: history.functionEndDate ? new Date(history.functionEndDate) : null,
                 functionStartDate: new Date(history.functionStartDate),
                 description: history.description,
@@ -79,6 +84,7 @@ export class UserDetails
         });
         this.membershipHistory = membershipHistory.map((history) => {
             return {
+                id: history.id,
                 changeDate: new Date(history.changeDate),
                 description: history.description,
                 membership: { id: history.membership.id, status: history.membership.status }

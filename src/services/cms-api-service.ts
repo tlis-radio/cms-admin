@@ -7,6 +7,15 @@ import { AllRoles } from "@/types/role";
 import { CreateShowDto, ShowDto, UpdateShowDto } from "@/types/show";
 import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateUserDto } from "@/types/user";
 
+const deleteAsync = async (uri: string) : Promise<void> =>
+{
+    const response = await fetch(uri, { method: "DELETE" });
+
+    if (response.status >= 400) {
+        throw new Error(response.statusText);
+    }
+}
+
 const getAsync = async <T>(uri: string) : Promise<T> =>
 {
     const response = await fetch(uri);

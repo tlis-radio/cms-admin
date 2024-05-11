@@ -31,6 +31,24 @@ export type UpdateUserDto = {
     lastname: string,
     nickname: string,
     abouth: string;
+    preferNicknameOverName: boolean;
+    roleHistory: Array<UpdateUserDtoRoleHistory>;
+    membershipHistory: Array<UpdateUserDtoMembershipHistory>;
+};
+
+export type UpdateUserDtoRoleHistory = {
+    id: string | null;
+    functionEndDate: string | null;
+    functionStartDate: string;
+    roleId: string; 
+    description: string | null;
+};
+
+export type UpdateUserDtoMembershipHistory = {
+    id: string | null;
+    membershipId: string;
+    description: string | null;
+    changeDate: string;
 };
 
 export type PaginationUserDto = {
@@ -54,17 +72,19 @@ export type GetByIdUserDto = {
     externalId: string | null;
     email: string | null;
     roleHistory: Array<GetByIdUserDtoRoleHistory>;
-    membershipHistory: Array<UserMembershipHistoryDtoMembershipHistory>;
+    membershipHistory: Array<GetByIdUserDtoMembershipHistory>;
 };
 
 export type GetByIdUserDtoRoleHistory = {
+    id: string | null;
     functionEndDate: string | null;
     functionStartDate: string;
     role: Role; 
     description: string | null;
 };
 
-export type UserMembershipHistoryDtoMembershipHistory = {
+export type GetByIdUserDtoMembershipHistory = {
+    id: string | null;
     membership: Membership;
     description: string | null;
     changeDate: string;
