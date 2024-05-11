@@ -29,7 +29,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         queryKey: [queryKey, page],
         queryFn: async () => queryFn(maxRows, page),
         keepPreviousData: true,
-        staleTime: 5000
+        refetchOnMount: true,
+        staleTime: 0
     });
 
     return (

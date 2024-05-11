@@ -12,7 +12,6 @@ import Accordeon from '@/components/accordeon';
 import AccordeonSegment from '@/components/accordeon/accordeon-segment';
 import Section from '@/components/form/section';
 import Select, { SelectData } from '@/components/form/select';
-import { DevTool } from "@hookform/devtools";
 import Button from '@/components/button';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
@@ -129,6 +128,12 @@ const UserForm: React.FC = () => {
       });
    };
 
+   const deleteFn = async () => {
+      if (!id) return;
+
+      return CmsApiService.User.DeleteAsync(id);
+   };
+
    return (
       <Form
          title={id ? "Upraviť uživatela" : "Nový uživatel"}
@@ -138,6 +143,7 @@ const UserForm: React.FC = () => {
          handleSubmit={handleSubmit}
          updateFn={updateFn}
          createFn={createFn}
+         deleteFn={id ? deleteFn : undefined}
       >
          <Input
             label='Prezývka uživatela'
@@ -237,7 +243,6 @@ const UserForm: React.FC = () => {
                ))}
             </Accordeon>
          </Section>
-         <DevTool control={control} />
       </Form>
    );
 };

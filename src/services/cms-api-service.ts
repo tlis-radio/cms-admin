@@ -122,6 +122,9 @@ const userEndpoints = {
     },
     GetMembershipsAsync: async () : Promise<AllMemberships> => {
         return await getAsync<AllMemberships>("/api/user-management/all-memberships");
+    },
+    DeleteAsync: async (id: string) : Promise<void> => {
+        await deleteAsync(`/api/user-management/${id}`);
     }
 };
 

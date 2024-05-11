@@ -4,7 +4,7 @@ import ServerError from "./server-error";
 import { useEffect, useState } from "react";
 import { getParentFolder } from "@/utils/routing";
 import Button from "../button";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
+import { faArrowLeft, faTrash } from "@fortawesome/free-solid-svg-icons"
 
 type FormProps = {
     title: string,
@@ -13,7 +13,8 @@ type FormProps = {
     otherServerError?: unknown;
     handleSubmit: UseFormHandleSubmit<any>,
     updateFn: (data: any) => Promise<void>,
-    createFn: (data: any) => Promise<void>
+    createFn: (data: any) => Promise<void>,
+    deleteFn?: () => Promise<void>
 };
 
 const Form: React.FC<FormProps & React.PropsWithChildren> = ({
@@ -24,6 +25,7 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
     handleSubmit,
     updateFn,
     createFn,
+    deleteFn,
     children
 }) => {
     const router = useRouter();
@@ -47,6 +49,23 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
         }
     });
 
+    const onDelete = async () => {
+        try
+        {
+            if (deleteFn == undefined)
+            {
+                return;
+            }
+
+            await deleteFn();
+            router.push(getParentFolder(pathname));
+        }
+        catch (error)
+        {
+            setServerError(error);
+        }
+    };
+
     if (isLoading)
     {
         return <p>Loading...</p>;
@@ -54,7 +73,10 @@ const Form: React.FC<FormProps & React.PropsWithChildren> = ({
 
     return (
         <div className='flex flex-col gap-4'>
-            <h1 className='font-bold border-b'>{title}</h1>
+            <span className="flex flex-row justify-between items-center border-b py-2">
+                <h1 className='font-bold text-lg'>{title}</h1>
+                { deleteFn && <Button type="DELETE" onClick={onDelete} icon={faTrash}/> }
+            </span>
             {serverError != undefined && <ServerError error={serverError} />}
             <form onSubmit={onSubmit} className='flex flex-col gap-4'>
                 {children}
