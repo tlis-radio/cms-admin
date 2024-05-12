@@ -87,6 +87,9 @@ const showEndpoints = {
     },
     UpdateAsync: async (id: string, dto: UpdateShowDto) : Promise<void> => {
         await putAsync(`/api/show-management/${id}`, dto);
+    },
+    DeleteAsync: async (id: string) : Promise<void> => {
+        await deleteAsync(`/api/show-management/${id}`);
     }
 };
 

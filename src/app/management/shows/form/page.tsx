@@ -65,6 +65,12 @@ const ShowForm: React.FC = () => {
         });
     };
 
+    const deleteFn = async () => {
+        if (!id) return;
+  
+        return CmsApiService.Show.DeleteAsync(id);
+     };
+
     return (
         <Form
             title={id ? "Upraviť reláciu" : "Nová relácia"}
@@ -74,6 +80,7 @@ const ShowForm: React.FC = () => {
             handleSubmit={handleSubmit}
             updateFn={updateFn}
             createFn={createFn}
+            deleteFn={id ? deleteFn : undefined}
         >
             <Input
                 label='Názov relácie'
