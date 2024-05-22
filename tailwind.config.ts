@@ -7,6 +7,11 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    extend: {
+      screens: {
+        'xl-custom': '2196px', 
+      },
+    },
   },
   plugins: [],
   safelist: [

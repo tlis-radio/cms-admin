@@ -1,6 +1,7 @@
 'use client';
 
 import Input from '@/components/form/input';
+import AreaInput from '@/components/form/area-input';
 import Select, { MultiSelectData } from '@/components/form/multi-select';
 import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
@@ -81,7 +82,7 @@ const ShowForm: React.FC = () => {
                 registerReturn={register("name", { required: "Relácia musí obsahovať názov." } )}
                 error={errors?.name}
             />
-            <Input
+            <AreaInput
                 label='Popis relácie'
                 placeholder='Popis relácie'
                 registerReturn={register("description", { required: "Relácia musí obsahovať popis." })}
