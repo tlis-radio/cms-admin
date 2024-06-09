@@ -66,7 +66,10 @@ const UserForm: React.FC = () => {
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
-         setValue("image", userData.profileImage.url);
+         if (userData.profileImage)
+         {
+            setValue("image", userData.profileImage.url);
+         }
          setValue("roleHistory", userData.roleHistory.map((m) => {
             return { 
                historyId: m.id,
