@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
+import { CreateResponse } from '@/types/cms-api-base-response';
 
 type ShowFormValues = {
     name: string;
@@ -58,7 +59,7 @@ const ShowForm: React.FC = () => {
         });
     };
 
-    const createFn = async (data: ShowFormValues) => {
+    const createFn = async (data: ShowFormValues): Promise<CreateResponse> => {
         return CmsApiService.Show.CreateNewAsync({
             name: data.name,
             description: data.description,

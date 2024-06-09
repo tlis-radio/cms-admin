@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getParentFolder } from "@/utils/routing";
 import Button from "../button";
 import { faArrowLeft, faTrash } from "@fortawesome/free-solid-svg-icons"
+import { CreateResponse } from "@/types/cms-api-base-response";
 
 type FormProps = {
     title: string,
@@ -13,7 +14,7 @@ type FormProps = {
     otherServerError?: unknown;
     handleSubmit: UseFormHandleSubmit<any>,
     updateFn: (data: any) => Promise<void>,
-    createFn: (data: any) => Promise<void>,
+    createFn: (data: any) => Promise<CreateResponse>,
     deleteFn?: () => Promise<void>
 };
 

@@ -17,6 +17,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
 import ImageInput from '@/components/form/image-input';
 import AreaInput from '@/components/form/area-input';
+import { CreateResponse } from '@/types/cms-api-base-response';
 
 type UserFormValues = {
    firstname: string;
@@ -119,7 +120,7 @@ const UserForm: React.FC = () => {
       });
    };
 
-   const createFn = async (data: UserFormValues) => {
+   const createFn = async (data: UserFormValues): Promise<CreateResponse> => {
       const respone = await CmsApiService.User.CreateNewActiveAsync({
          firstname: data.firstname,
          lastname: data.lastname,
@@ -145,6 +146,8 @@ const UserForm: React.FC = () => {
       {
          CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], respone.id);
       }
+
+      return respone;
    };
 
    const deleteFn = async () => {
