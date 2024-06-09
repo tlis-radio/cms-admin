@@ -5,7 +5,7 @@ import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from "react";
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
 import Accordeon from '@/components/accordeon';
@@ -15,6 +15,7 @@ import Select, { SelectData } from '@/components/form/select';
 import Button from '@/components/button';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
+import ImageInput from '@/components/form/image-input';
 
 type UserFormValues = {
    firstname: string;
@@ -24,6 +25,7 @@ type UserFormValues = {
    abouth: string;
    email: string | null;
    password: string;
+   image: FileList | string | null;
    roleHistory: Array<{ historyId: string | null, role: SelectData, functionStartDate: Date, functionEndDate: Date | null }>;
    membershipHistory: Array<{ historyId: string | null, membership: SelectData, changeDate: Date }>;
 };
@@ -32,13 +34,15 @@ const UserForm: React.FC = () => {
    const searchParams = useSearchParams();
    const id = searchParams.get('id');
    const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<UserFormValues>({
-      defaultValues: { firstname: "", lastname: "", nickname: "", preferNicknameOverName: true, abouth: "", email: "", roleHistory: [], membershipHistory: [] }
+      defaultValues: { firstname: "", lastname: "", nickname: "", image: null, preferNicknameOverName: true, abouth: "", email: "", roleHistory: [], membershipHistory: [] }
    });
+   const imageWatch = useWatch({ control, name: "image" });
+   
    const { fields: roleHistoryFields, append: appendRoleHistory, remove: removeRoleHistory, update: updateRoleHistory } = useFieldArray({ control, name: "roleHistory" });
    const { fields: membershipHistoryFields, append: appendMembershipHistory, remove: removeMembershipHistory, update: updateMembershipHistory } = useFieldArray({ control, name: "membershipHistory" });
 
    const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
-      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: 0 });
+      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: Infinity, cacheTime: 0 });
 
    const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
       { queryKey: ['roles'], queryFn: () => CmsApiService.User.GetRolesAsync(), staleTime: Infinity });
@@ -62,6 +66,7 @@ const UserForm: React.FC = () => {
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
+         setValue("image", userData.profileImage.url);
          setValue("roleHistory", userData.roleHistory.map((m) => {
             return { 
                historyId: m.id,
@@ -82,6 +87,11 @@ const UserForm: React.FC = () => {
 
    const updateFn = async (data: UserFormValues) => {
       if (!id || !userData) return;
+
+      if (data.image && typeof data.image !== "string")
+      {
+         await CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], id);
+      }
 
       return CmsApiService.User.UpdateAsync(id, {
          firstname: data.firstname,
@@ -106,7 +116,7 @@ const UserForm: React.FC = () => {
    };
 
    const createFn = async (data: UserFormValues) => {
-      return CmsApiService.User.CreateNewActiveAsync({
+      const respone = await CmsApiService.User.CreateNewActiveAsync({
          firstname: data.firstname,
          lastname: data.lastname,
          nickname: data.nickname,
@@ -126,6 +136,11 @@ const UserForm: React.FC = () => {
             changeDate: m.changeDate.toISOString()
          }))
       });
+
+      if (data.image && typeof data.image !== "string")
+      {
+         CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], respone.id);
+      }
    };
 
    const deleteFn = async () => {
@@ -175,6 +190,9 @@ const UserForm: React.FC = () => {
             registerReturn={register("abouth", { required: "Uživatel musí obsahovať popis." })}
             error={errors?.abouth}
          />
+         <div className='flex flex-row justify-center'>
+            <ImageInput registerReturn={register("image")} watch={imageWatch} />
+         </div>
          <Section
             title='Role History'
             onAdd={() => { appendRoleHistory({ historyId: null, role: { id: "", value: "Empty" }, functionStartDate: new Date(), functionEndDate: null }) }}

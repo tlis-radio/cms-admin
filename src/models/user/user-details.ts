@@ -7,7 +7,10 @@ export class UserDetails
     public lastname: string;
     public nickname: string;
     public abouth: string;
-    public profileImageId: string;
+    public profileImage: {
+        id: string;
+        url: string;
+    };
     public isActive: boolean;
     public preferNicknameOverName: boolean;
     public externalId: string | null;
@@ -40,7 +43,10 @@ export class UserDetails
         abouth: string,
         email: string | null,
         isActive: boolean,
-        profileImageId: string,
+        profileImage: {
+            id: string;
+            url: string;
+        },
         preferNicknameOverName: boolean,
         externalId: string | null,
         roleHistory: Array<{
@@ -70,7 +76,7 @@ export class UserDetails
         this.abouth = abouth;
         this.email = email;
         this.isActive = isActive;
-        this.profileImageId = profileImageId;
+        this.profileImage = profileImage;
         this.preferNicknameOverName = preferNicknameOverName;
         this.externalId = externalId;
         this.roleHistory = roleHistory.map((history) => {
@@ -102,7 +108,7 @@ export class UserDetails
             dto.abouth,
             dto.email,
             dto.isActive,
-            dto.profileImageId,
+            dto.profileImage,
             dto.preferNicknameOverName,
             dto.externalId,
             dto.roleHistory,

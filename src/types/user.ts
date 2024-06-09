@@ -66,13 +66,18 @@ export type GetByIdUserDto = {
     lastname: string;
     nickname: string;
     abouth: string;
-    profileImageId: string;
+    profileImage: GetByIdUserDtoImage;
     isActive: boolean;
     preferNicknameOverName: boolean;
     externalId: string | null;
     email: string | null;
     roleHistory: Array<GetByIdUserDtoRoleHistory>;
     membershipHistory: Array<GetByIdUserDtoMembershipHistory>;
+};
+
+export type GetByIdUserDtoImage = {
+    id: string;
+    url: string;
 };
 
 export type GetByIdUserDtoRoleHistory = {

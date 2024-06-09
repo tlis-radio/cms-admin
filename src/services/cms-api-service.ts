@@ -2,6 +2,7 @@ import { Pagination, PaginationDto } from "@/models/pagination";
 import { Show } from "@/models/show";
 import { UserBasicInformations } from "@/models/user/user-basic-informations";
 import { UserDetails } from "@/models/user/user-details";
+import { CreateResponse } from "@/types/cms-api-base-response";
 import { AllMemberships } from "@/types/membership";
 import { AllRoles } from "@/types/role";
 import { CreateShowDto, ShowDto, UpdateShowDto } from "@/types/show";
@@ -27,7 +28,7 @@ const getAsync = async <T>(uri: string) : Promise<T> =>
     return response.json();
 }
 
-const postAsync = async <T>(uri: string, body: T) : Promise<void> =>
+const postAsync = async <T, U>(uri: string, body: T) : Promise<U> =>
 {
     var response = await fetch(
         uri,
@@ -42,6 +43,8 @@ const postAsync = async <T>(uri: string, body: T) : Promise<void> =>
     if (response.status >= 400) {
         throw new Error(response.statusText);
     }
+
+    return await response.json();
 }
 
 const putAsync = async <T>(uri: string, body: T) : Promise<void> =>
@@ -60,6 +63,25 @@ const putAsync = async <T>(uri: string, body: T) : Promise<void> =>
         throw new Error(response.statusText);
     }
 }
+
+const imageEndpoints = {
+    UploadUserProfileImageAsync: async (image: File, userId: string) : Promise<string> => {
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("userId", userId);
+
+        const response = await fetch("/api/image-asset-management/user-profile", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.status >= 400) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.text();
+    }
+};
 
 const showEndpoints = {
     PaginationAsync: async (limit: number, page: number) : Promise<Pagination<Show>> => {
@@ -82,9 +104,8 @@ const showEndpoints = {
 
         return Show.fromDto(result);
     },
-    CreateNewAsync: async (dto: CreateShowDto) : Promise<void> => {
-        await postAsync("/api/show-management", dto);
-    },
+    CreateNewAsync: async (dto: CreateShowDto) : Promise<CreateResponse> => 
+        await postAsync<CreateShowDto, CreateResponse>("/api/show-management", dto),
     UpdateAsync: async (id: string, dto: UpdateShowDto) : Promise<void> => {
         await putAsync(`/api/show-management/${id}`, dto);
     },
@@ -114,9 +135,8 @@ const userEndpoints = {
 
         return UserDetails.fromDto(id, result);
     },
-    CreateNewActiveAsync: async (dto: CreateUserDto) : Promise<void> => {
-        await postAsync("/api/user-management", dto);
-    },
+    CreateNewActiveAsync: async (dto: CreateUserDto) : Promise<CreateResponse> =>
+        await postAsync<CreateUserDto, CreateResponse>("/api/user-management", dto),
     UpdateAsync: async (id: string, dto: UpdateUserDto) : Promise<void> => {
         await putAsync(`/api/user-management/${id}`, dto);
     },
@@ -138,20 +158,7 @@ class CmsApiService
 
     static User = userEndpoints;
 
-    public static async PostAsync(uri: string, body: any) : Promise<void>
-    {
-        const response = await fetch(
-            uri,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            });
-
-        await response;
-    }
+    static Image = imageEndpoints;
 }
 
 export default CmsApiService;

@@ -12,6 +12,7 @@ export const fetchDelete = async (props: fetchDelete) => {
     return callFetch({
         path: props.path,
         method: "DELETE",
+        contentType: "application/json",
         accessToken
     });
 }
@@ -29,17 +30,30 @@ export const fetchGet = async (props: fetchGet) => {
         return callFetch({
             path: props.path,
             method: "GET",
+            contentType: "application/json",
             accessToken
         });
     }
 
-    return callFetch({ path: props.path, method: "GET" });
+    return callFetch({ path: props.path, method: "GET", contentType: "application/json" });
 }
 
 type fetchPost = {
     path: string;
     body: NextRequest
 }
+
+export const fetchPostFormData = async (props: fetchPost) => {
+    const { accessToken } = await getAccessToken();
+
+    return callFetch({
+        path: props.path,
+        method: "POST",
+        body: props.body,
+        contentType: "multipart/form-data",
+        accessToken
+    });
+};
 
 export const fetchPost = async (props: fetchPost) => {
     const { accessToken } = await getAccessToken();
@@ -48,6 +62,7 @@ export const fetchPost = async (props: fetchPost) => {
         path: props.path,
         method: "POST",
         body: props.body,
+        contentType: "application/json",
         accessToken
     });
 };
@@ -64,22 +79,24 @@ export const fetchPut = async (props: fetchPut) => {
         path: props.path,
         method: "PUT",
         body: props.body,
+        contentType: "application/json",
         accessToken
     });
 };
 
 type callFetchProps = {
-    path: string;
-    method: "GET" | "POST" | "PUT" | "DELETE";
+    path: string,
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    contentType: "application/json" | "multipart/form-data",
     body?: NextRequest,
-    accessToken?: string,
+    accessToken?: string
 };
 
 const callFetch = async (props: callFetchProps) => {
     try
     {
         let headers: HeadersInit = {
-            'Content-Type': 'application/json'
+            // 'Content-Type': props.contentType
         };
 
         if (props.accessToken) {
@@ -90,15 +107,19 @@ const callFetch = async (props: callFetchProps) => {
             `${env.CMS_API_URL}/${props.path}`, {
             method: props.method,
             headers,
-            body: props.body ? JSON.stringify(await props.body.json()) : undefined
+            body: await getBody(props)
         });
 
         if (response.status < 300) {
             if (response.status === 204) {
-            return NextResponse.json({}, { status: 200, statusText: response.statusText });
+                return NextResponse.json({}, { status: 200, statusText: response.statusText });
             }
+        }
 
-            return NextResponse.json(await response.json());
+        var message = await response.json();
+        if (message)
+        {
+            return NextResponse.json(message);
         }
 
         return NextResponse.json({}, { status: response.status, statusText: response.statusText });
@@ -108,3 +129,12 @@ const callFetch = async (props: callFetchProps) => {
       return NextResponse.json({}, { status: 500 })
     }
 };
+
+const getBody = async (props: callFetchProps): Promise<any | null> => {
+    if (props.contentType == "multipart/form-data")
+    {
+        return props.body?.formData();
+    }
+
+    return props.body ? JSON.stringify(await props.body.json()) : undefined;
+}
