@@ -16,6 +16,7 @@ import Button from '@/components/button';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
 import ImageInput from '@/components/form/image-input';
+import AreaInput from '@/components/form/area-input';
 
 type UserFormValues = {
    firstname: string;
@@ -187,7 +188,7 @@ const UserForm: React.FC = () => {
             registerReturn={register("lastname", { required: "Uživatel musí obsahovať priezvisko." })}
             error={errors?.lastname}
          />
-         <Input
+         <AreaInput
             label='Popis uživatela'
             placeholder='Popis uživatela'
             registerReturn={register("abouth", { required: "Uživatel musí obsahovať popis." })}
