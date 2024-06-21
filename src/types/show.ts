@@ -10,16 +10,25 @@ export type UpdateShowDto = {
    moderatorIds: Array<string>
 };
 
+export type UpdateProfileImageShowDto = {
+   profileImageId: string;
+};
+
 export type ShowDto = {
    id: string,
    name: string,
    description: string,
    moderators: Array<ShowModeratorDto>,
    createdDate: string,
-   profileImageUrl?: string
+   profileImage: ShowDtoImage
 };
 
 export type ShowModeratorDto = {
    id: string,
    nickName: string
 };
+
+export type ShowDtoImage = {
+   id: string;
+   url: string;
+}

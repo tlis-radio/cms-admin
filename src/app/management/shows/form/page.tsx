@@ -7,15 +7,16 @@ import CmsApiService from '@/services/cms-api-service';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import Form from '@/components/form';
-import { CreateResponse } from '@/types/cms-api-base-response';
+import ImageInput from '@/components/form/image-input';
 
 type ShowFormValues = {
     name: string;
     description: string;
     moderators: Array<MultiSelectData>;
+    image: FileList | string | null;
 };
 
 const limit = 10;
@@ -24,10 +25,11 @@ const ShowForm: React.FC = () => {
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<ShowFormValues>({
-        defaultValues: { name: "", description: "", moderators: [] }
+        defaultValues: { name: "", description: "", moderators: [], image: null }
     });
+    const imageWatch = useWatch({ control, name: "image" });
 
-    const { data: showData, isFetching: showIsFetching, error: showError } = useQuery(
+    const { data: showData, isFetching: showIsFetching, isFetched: showIsFetched, error: showError } = useQuery(
         { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null, refetchOnMount: true, cacheTime: 0 });
 
     const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
@@ -46,25 +48,45 @@ const ShowForm: React.FC = () => {
             setValue("name", showData.name);
             setValue("description", showData.description);
             setValue("moderators", showData.moderators.map((m) => { return { id: m.id, value: m.nickName }}));
+            if (showData.profileImage)
+            {
+                setValue("image", showData.profileImage.url);
+            }
         }
-    }, [showData, setValue, userOptions]);
+    }, [showIsFetched]);
 
     const updateFn = async (data: ShowFormValues) => {
         if (!id) return;
 
-        return CmsApiService.Show.UpdateAsync(id, {
+        await CmsApiService.Show.UpdateAsync(id, {
             name: data.name,
             description: data.description,
             moderatorIds: data.moderators?.map((moderator) => { return moderator.id; })
         });
+
+        if (imageWatch && typeof imageWatch !== "string")
+        {
+            var response = await CmsApiService.Image.UploadShowProfileImageAsync(imageWatch[0], id);
+
+            await CmsApiService.Show.UpdateProfileImageAsync(id, { profileImageId: response.id });
+        }
     };
 
-    const createFn = async (data: ShowFormValues): Promise<CreateResponse> => {
-        return CmsApiService.Show.CreateNewAsync({
+    const createFn = async (data: ShowFormValues): Promise<void> => {
+        if (!imageWatch || typeof imageWatch == "string")
+        {
+            return;
+        }
+
+        var response = await CmsApiService.Show.CreateNewAsync({
             name: data.name,
             description: data.description,
             moderatorIds: data.moderators?.map((moderator) => { return moderator.id; })
         });
+
+        var imageResponse = await CmsApiService.Image.UploadShowProfileImageAsync(imageWatch[0], response.id);
+
+        await CmsApiService.Show.UpdateProfileImageAsync(response.id, { profileImageId: imageResponse.id });
     };
 
     const deleteFn = async () => {
@@ -114,6 +136,9 @@ const ShowForm: React.FC = () => {
                     />
                 )}
             />
+            <div className='flex flex-row justify-center'>
+                <ImageInput registerReturn={register("image")} watch={imageWatch} />
+            </div>
         </Form>
     );
 };

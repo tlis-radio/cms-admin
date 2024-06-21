@@ -14,7 +14,7 @@ type FormProps = {
     otherServerError?: unknown;
     handleSubmit: UseFormHandleSubmit<any>,
     updateFn: (data: any) => Promise<void>,
-    createFn: (data: any) => Promise<CreateResponse>,
+    createFn: (data: any) => Promise<void>,
     deleteFn?: () => Promise<void>
 };
 

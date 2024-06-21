@@ -5,7 +5,7 @@ import { UserDetails } from "@/models/user/user-details";
 import { CreateResponse } from "@/types/cms-api-base-response";
 import { AllMemberships } from "@/types/membership";
 import { AllRoles } from "@/types/role";
-import { CreateShowDto, ShowDto, UpdateShowDto } from "@/types/show";
+import { CreateShowDto, ShowDto, UpdateProfileImageShowDto, UpdateShowDto } from "@/types/show";
 import { GetByIdUserDto, UpdateUserDto, PaginationUserDto, CreateUserDto } from "@/types/user";
 
 const deleteAsync = async (uri: string) : Promise<void> =>
@@ -65,7 +65,7 @@ const putAsync = async <T>(uri: string, body: T) : Promise<void> =>
 }
 
 const imageEndpoints = {
-    UploadUserProfileImageAsync: async (image: File, userId: string) : Promise<string> => {
+    UploadUserProfileImageAsync: async (image: File, userId: string) : Promise<CreateResponse> => {
         const formData = new FormData();
         formData.append("image", image);
         formData.append("userId", userId);
@@ -79,7 +79,23 @@ const imageEndpoints = {
             throw new Error(response.statusText);
         }
 
-        return await response.text();
+        return await response.json();
+    },
+    UploadShowProfileImageAsync: async (image: File, userId: string) : Promise<CreateResponse> => {
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("showId", userId);
+
+        const response = await fetch("/api/image-asset-management/show-profile", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.status >= 400) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json();
     }
 };
 
@@ -108,6 +124,9 @@ const showEndpoints = {
         await postAsync<CreateShowDto, CreateResponse>("/api/show-management", dto),
     UpdateAsync: async (id: string, dto: UpdateShowDto) : Promise<void> => {
         await putAsync(`/api/show-management/${id}`, dto);
+    },
+    UpdateProfileImageAsync: async (id: string, dto: UpdateProfileImageShowDto) : Promise<void> => {
+        await putAsync(`/api/show-management/${id}/profile-image`, dto);
     },
     DeleteAsync: async (id: string) : Promise<void> => {
         await deleteAsync(`/api/show-management/${id}`);

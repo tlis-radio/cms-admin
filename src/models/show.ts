@@ -7,7 +7,10 @@ export class Show
     public description: string;
     public moderators: Array<{ id: string, nickName: string }>;
     public createdDate: string;
-    public profileImageUrl?: string;
+    public profileImage: {
+        id: string;
+        url: string;
+    };
 
     constructor(
         id: string,
@@ -15,14 +18,17 @@ export class Show
         description: string,
         moderators: Array<{ id: string, nickName: string }>,
         createdDate: string,
-        profileImageUrl?: string
+        profileImage: {
+            id: string;
+            url: string;
+        }
     ) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.moderators = moderators;
         this.createdDate = createdDate;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImage = profileImage;
     }
 
     public static fromDto(dto: ShowDto): Show
@@ -33,7 +39,7 @@ export class Show
             dto.description,
             dto.moderators,
             dto.createdDate,
-            dto.profileImageUrl
+            dto.profileImage
         );
     }
 }

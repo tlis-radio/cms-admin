@@ -120,8 +120,9 @@ const UserForm: React.FC = () => {
       });
    };
 
-   const createFn = async (data: UserFormValues): Promise<CreateResponse> => {
-      const respone = await CmsApiService.User.CreateNewActiveAsync({
+   // TODO: upload image skor ako creatnes nech sa mu pridadi image
+   const createFn = async (data: UserFormValues): Promise<void> => {
+      const response = await CmsApiService.User.CreateNewActiveAsync({
          firstname: data.firstname,
          lastname: data.lastname,
          nickname: data.nickname,
@@ -144,10 +145,8 @@ const UserForm: React.FC = () => {
 
       if (data.image && typeof data.image !== "string")
       {
-         CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], respone.id);
+         CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], response.id);
       }
-
-      return respone;
    };
 
    const deleteFn = async () => {

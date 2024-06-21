@@ -95,8 +95,9 @@ type callFetchProps = {
 const callFetch = async (props: callFetchProps) => {
     try
     {
-        let headers: HeadersInit = {
-            // 'Content-Type': props.contentType
+        let headers: HeadersInit = props.contentType === "multipart/form-data"
+        ? {} : {
+            'Content-Type': props.contentType
         };
 
         if (props.accessToken) {
