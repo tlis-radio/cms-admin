@@ -165,6 +165,9 @@ const userEndpoints = {
     GetMembershipsAsync: async () : Promise<AllMemberships> => {
         return await getAsync<AllMemberships>("/api/user-management/all-memberships");
     },
+    UpdateProfileImageAsync: async (id: string, dto: UpdateProfileImageShowDto) : Promise<void> => {
+        await putAsync(`/api/user-management/${id}/profile-image`, dto);
+    },
     DeleteAsync: async (id: string) : Promise<void> => {
         await deleteAsync(`/api/user-management/${id}`);
     }

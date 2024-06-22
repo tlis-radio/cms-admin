@@ -17,7 +17,6 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
 import ImageInput from '@/components/form/image-input';
 import AreaInput from '@/components/form/area-input';
-import { CreateResponse } from '@/types/cms-api-base-response';
 
 type UserFormValues = {
    firstname: string;
@@ -43,7 +42,7 @@ const UserForm: React.FC = () => {
    const { fields: roleHistoryFields, append: appendRoleHistory, remove: removeRoleHistory, update: updateRoleHistory } = useFieldArray({ control, name: "roleHistory" });
    const { fields: membershipHistoryFields, append: appendMembershipHistory, remove: removeMembershipHistory, update: updateMembershipHistory } = useFieldArray({ control, name: "membershipHistory" });
 
-   const { data: userData, isFetching: userIsFetching, error: userError } = useQuery(
+   const { data: userData, isFetching: userIsFetching, isFetched: userIsFetched, error: userError } = useQuery(
       { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: Infinity, cacheTime: 0 });
 
    const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
@@ -88,17 +87,17 @@ const UserForm: React.FC = () => {
             }
          }));
       }
-   }, [userData, setValue]);
+   }, [userIsFetched]);
 
    const updateFn = async (data: UserFormValues) => {
       if (!id || !userData) return;
 
-      if (data.image && typeof data.image !== "string")
+      if (imageWatch && typeof imageWatch !== "string")
       {
-         await CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], id);
+         await CmsApiService.Image.UploadUserProfileImageAsync(imageWatch[0], id);
       }
 
-      return CmsApiService.User.UpdateAsync(id, {
+      await CmsApiService.User.UpdateAsync(id, {
          firstname: data.firstname,
          lastname: data.lastname,
          nickname: data.nickname,
@@ -118,10 +117,21 @@ const UserForm: React.FC = () => {
             functionStartDate: m.functionStartDate.toISOString(),
          }))
       });
+
+      if (imageWatch && typeof imageWatch !== "string")
+      {
+         var response = await CmsApiService.Image.UploadUserProfileImageAsync(imageWatch[0], id);
+
+         await CmsApiService.User.UpdateProfileImageAsync(id, { profileImageId: response.id });
+      }
    };
 
-   // TODO: upload image skor ako creatnes nech sa mu pridadi image
    const createFn = async (data: UserFormValues): Promise<void> => {
+      if (!imageWatch || typeof imageWatch == "string")
+      {
+         return;
+      }
+
       const response = await CmsApiService.User.CreateNewActiveAsync({
          firstname: data.firstname,
          lastname: data.lastname,
@@ -143,10 +153,9 @@ const UserForm: React.FC = () => {
          }))
       });
 
-      if (data.image && typeof data.image !== "string")
-      {
-         CmsApiService.Image.UploadUserProfileImageAsync(data.image[0], response.id);
-      }
+      var imageResponse = await CmsApiService.Image.UploadUserProfileImageAsync(imageWatch[0], response.id);
+
+      await CmsApiService.User.UpdateProfileImageAsync(response.id, { profileImageId: imageResponse.id });
    };
 
    const deleteFn = async () => {
