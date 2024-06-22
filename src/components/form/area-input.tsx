@@ -7,8 +7,8 @@ import InputLabel from "./input-label";
 type InputProps = {
     label: string;
     placeholder: string;
-    registerReturn: UseFormRegisterReturn;
-    error: FieldError | undefined;
+    registerReturn?: UseFormRegisterReturn;
+    error?: FieldError | undefined;
 }
 
 const  AreaInput: FunctionComponent<InputProps> = ({ label, placeholder, registerReturn, error }) => {

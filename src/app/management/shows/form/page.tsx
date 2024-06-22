@@ -75,7 +75,7 @@ const ShowForm: React.FC = () => {
     const createFn = async (data: ShowFormValues): Promise<void> => {
         if (!imageWatch || typeof imageWatch == "string")
         {
-            return;
+            throw new Error("Image is required");
         }
 
         var response = await CmsApiService.Show.CreateNewAsync({
@@ -121,7 +121,7 @@ const ShowForm: React.FC = () => {
             <Controller
                 name="moderators"
                 control={control}
-                rules={{ minLength: 1 }}
+                rules={{ required: "Relácia musí obsahovať minimálne jeden moderátor." }}
                 render={({ field: { onChange, value } }) => (
                     <MultiSelect
                         label='Moderátori'
@@ -129,15 +129,17 @@ const ShowForm: React.FC = () => {
                         options={userOptions}
                         isLoading={usersIsFetching}
                         fetchMoreData={usersFetchNextPage}
-                        registerReturn={register("moderators", { minLength: 1 })}
-                        setError={setError}
                         error={errors?.moderators}
                         onChange={onChange}
                     />
                 )}
             />
             <div className='flex flex-row justify-center'>
-                <ImageInput registerReturn={register("image")} watch={imageWatch} />
+                <ImageInput
+                    registerReturn={register("image", { validate: (x) => x === null ? "Relácia musí obsahovať obrázok" : true })}
+                    watch={imageWatch}
+                    error={errors?.image}
+                />
             </div>
         </Form>
     );

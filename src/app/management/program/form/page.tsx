@@ -59,7 +59,7 @@ const ShowForm: React.FC = () => {
     };
 
     const createFn = async (data: ShowFormValues) => {
-        return CmsApiService.Show.CreateNewAsync({
+        await CmsApiService.Show.CreateNewAsync({
             name: data.name,
             description: data.description,
             moderatorIds: data.moderators?.map((moderator) => { return moderator.id; })
@@ -99,8 +99,6 @@ const ShowForm: React.FC = () => {
                         options={userOptions}
                         isLoading={usersIsFetching}
                         fetchMoreData={usersFetchNextPage}
-                        registerReturn={register("moderators", { minLength: 1 })}
-                        setError={setError}
                         error={errors?.moderators}
                         onChange={onChange}
                     />

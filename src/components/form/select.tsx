@@ -14,7 +14,7 @@ export type SelectData = {
 
 type SelectProps = {
     label: string;
-    error: Merge<FieldError, FieldErrorsImpl<SelectData>> | undefined;
+    error?: Merge<FieldError, FieldErrorsImpl<SelectData>> | undefined;
     selectedOption: SelectData;
     options: Array<SelectData>;
     isLoading: boolean;
@@ -40,15 +40,6 @@ const Select: FunctionComponent<SelectProps> = ({
         }
     }, [fetchMoreData]);
 
-    // useEffect(() => {
-    //     if (!error && selectedOptions.length < 1)
-    //     {
-    //         setError(registerReturn.name, { type: 'minLength', message: 'Relácia musí obsahovať aspoň jedného moderátora.' });
-    //     }
-    // }, [registerReturn, selectedOptions, setError, error]);
-
-    
-
     return (
         <div className="flex flex-col gap-2 w-72">
             <InputLabel label={label}/>
@@ -72,7 +63,7 @@ const Select: FunctionComponent<SelectProps> = ({
                     >
                         <Listbox.Options
                             onScroll={(e) => memorizedOnScroll(e.target as HTMLElement)}
-                            className="absolute mt-1 max-h-60 w-full overflow-auto bg-white shadow appearance-none border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                            className="absolute mt-1 max-h-60 w-full overflow-auto bg-white shadow appearance-none border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm z-50"
                         >
                             {options.map((option) => (
                                 <Listbox.Option

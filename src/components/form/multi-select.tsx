@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent, useCallback } from "react";
+import { Fragment, FunctionComponent, useCallback, useEffect } from "react";
 import { ErrorOption, FieldError, FieldErrorsImpl, Merge, UseFormRegisterReturn, UseFormSetError } from "react-hook-form";
 import InputLabel from "./input-label";
 import InputError from "./input-error";
@@ -19,8 +19,6 @@ type MultiSelectProps = {
     options: Array<MultiSelectData>;
     isLoading: boolean;
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
-    setError: UseFormSetError<any>;
-    registerReturn: UseFormRegisterReturn;
     onChange: (...event: any[]) => void;
 }
 
@@ -29,8 +27,6 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
     error,
     isLoading,
     fetchMoreData,
-    registerReturn,
-    setError,
     selectedOptions,
     options,
     onChange
@@ -41,13 +37,6 @@ const MultiSelect: FunctionComponent<MultiSelectProps> = ({
             await fetchMoreData();
         }
     }, [fetchMoreData]);
-
-    // useEffect(() => {
-    //     if (!error && selectedOptions.length < 1)
-    //     {
-    //         setError(registerReturn.name, { type: 'minLength', message: 'Relácia musí obsahovať aspoň jedného moderátora.' });
-    //     }
-    // }, [registerReturn, selectedOptions, setError, error]);
 
     const getValues = (): MultiSelectData[] => {
         return options.filter((option) => selectedOptions?.find(v => v.id == option.id));

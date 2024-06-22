@@ -17,6 +17,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import DateInput from '@/components/form/date-input';
 import ImageInput from '@/components/form/image-input';
 import AreaInput from '@/components/form/area-input';
+import { DevTool } from "@hookform/devtools";
 
 type UserFormValues = {
    firstname: string;
@@ -27,8 +28,8 @@ type UserFormValues = {
    email: string | null;
    password: string;
    image: FileList | string | null;
-   roleHistory: Array<{ historyId: string | null, role: SelectData, functionStartDate: Date, functionEndDate: Date | null }>;
-   membershipHistory: Array<{ historyId: string | null, membership: SelectData, changeDate: Date }>;
+   roleHistory: Array<{ historyId: string | null, role: SelectData, functionStartDate: Date, functionEndDate: Date | null, description: string | null }>;
+   membershipHistory: Array<{ historyId: string | null, membership: SelectData, changeDate: Date, description: string | null }>;
 };
 
 const UserForm: React.FC = () => {
@@ -69,13 +70,14 @@ const UserForm: React.FC = () => {
          setValue("email", userData.email);
          if (userData.profileImage)
          {
-            setValue("image", userData.profileImage.url);
+            setValue("image", userData.profileImage.url, { shouldValidate: true });
          }
          setValue("roleHistory", userData.roleHistory.map((m) => {
             return { 
                historyId: m.id,
                functionStartDate: m.functionStartDate,
                functionEndDate: m.functionEndDate,
+               description: m.description,
                role: { id: m.role.id, value: m.role.name }
             }
          }));
@@ -83,6 +85,7 @@ const UserForm: React.FC = () => {
             return {
                historyId: m.id,
                changeDate: m.changeDate,
+               description: m.description,
                membership: { id: m.membership.id, value: m.membership.status }
             }
          }));
@@ -106,13 +109,13 @@ const UserForm: React.FC = () => {
          membershipHistory: data.membershipHistory.map((m) => ({
             id: m.historyId,
             membershipId: m.membership.id,
-            description: "", // TODO: text area
+            description: m.description,
             changeDate: m.changeDate.toISOString(),
          })),
          roleHistory: data.roleHistory.map((m) => ({
             id: m.historyId,
             roleId: m.role.id,
-            description: "", // TODO: text area
+            description: m.description,
             functionEndDate: m.functionEndDate?.toISOString() ?? null,
             functionStartDate: m.functionStartDate.toISOString(),
          }))
@@ -144,11 +147,11 @@ const UserForm: React.FC = () => {
             functionEndDate: m.functionEndDate?.toISOString() ?? null,
             functionStartDate: m.functionStartDate.toISOString(),
             roleId: m.role.id,
-            description: "" // TODO: text area
+            description: m.description
          })),
          membershipHistory: data.membershipHistory.map((m) => ({
             membershipId: m.membership.id,
-            description: "", // TODO: text area
+            description: m.description,
             changeDate: m.changeDate.toISOString()
          }))
       });
@@ -178,7 +181,7 @@ const UserForm: React.FC = () => {
          <Input
             label='Prezývka uživatela'
             placeholder='Prezývka uživatela'
-            registerReturn={register("nickname", { required: "Uživatel musí obsahovať prezívkú." })}
+            registerReturn={register("nickname", { required: "Uživatel musí obsahovať prezívku." })}
             error={errors?.nickname}
          />
          <Input
@@ -206,11 +209,15 @@ const UserForm: React.FC = () => {
             error={errors?.abouth}
          />
          <div className='flex flex-row justify-center'>
-            <ImageInput registerReturn={register("image")} watch={imageWatch} />
+            <ImageInput
+               registerReturn={register("image", { validate: (x) => x === null ? "Uživatel musí obsahovať obrázok" : true })}
+               watch={imageWatch}
+               error={errors?.image}
+            />
          </div>
          <Section
             title='Role History'
-            onAdd={() => { appendRoleHistory({ historyId: null, role: { id: "", value: "Empty" }, functionStartDate: new Date(), functionEndDate: null }) }}
+            onAdd={() => { appendRoleHistory({ historyId: null, role: { id: roleOptions[0].id, value: roleOptions[0].value }, functionStartDate: new Date(), functionEndDate: null, description: null }) }}
          >
             <Accordeon>
                {roleHistoryFields.map((field, index) => (
@@ -231,8 +238,12 @@ const UserForm: React.FC = () => {
                         selectedOption={field.role}
                         options={roleOptions}
                         isLoading={rolesIsFetching}
-                        error={errors?.roleHistory}
                         onChange={(ev) => updateRoleHistory(index, { ...field, role: ev })}
+                     />
+                     <AreaInput
+                        label='Popis'
+                        placeholder='Popis'
+                        registerReturn={register(`roleHistory.${index}.description`)}
                      />
                      <span className='flex flex-row justify-end py-4'>
                         <Button
@@ -247,7 +258,7 @@ const UserForm: React.FC = () => {
          </Section>
          <Section
             title='Membership History'
-            onAdd={() => { appendMembershipHistory({ historyId: null, membership: { id: "", value: membershipOptions[0].value }, changeDate: new Date()})}}
+            onAdd={() => { appendMembershipHistory({ historyId: null, membership: { id: membershipOptions[0].id, value: membershipOptions[0].value }, changeDate: new Date(), description: null})}}
          >
             <Accordeon>
                {membershipHistoryFields.map((field, index) => (
@@ -257,13 +268,17 @@ const UserForm: React.FC = () => {
                         selectedOption={field.membership}
                         options={membershipOptions}
                         isLoading={membershipsIsFetching}
-                        error={errors?.membershipHistory}
                         onChange={(ev) => updateMembershipHistory(index, { ...field, membership: ev })}
                      />
                      <DateInput
                         label='Change Date'
                         value={field.changeDate}
                         onChange={(ev) => updateMembershipHistory(index, { ...field, changeDate: ev })}
+                     />
+                     <AreaInput
+                        label='Popis'
+                        placeholder='Popis'
+                        registerReturn={register(`membershipHistory.${index}.description`)}
                      />
                      <span className='flex flex-row justify-end py-4'>
                         <Button
@@ -276,6 +291,7 @@ const UserForm: React.FC = () => {
                ))}
             </Accordeon>
          </Section>
+         <DevTool control={control} />
       </Form>
    );
 };

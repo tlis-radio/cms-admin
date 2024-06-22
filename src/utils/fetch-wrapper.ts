@@ -120,7 +120,7 @@ const callFetch = async (props: callFetchProps) => {
         var message = await response.json();
         if (message)
         {
-            return NextResponse.json(message);
+            return NextResponse.json(message, { status: response.status });
         }
 
         return NextResponse.json({}, { status: response.status, statusText: response.statusText });
