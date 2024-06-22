@@ -5,7 +5,7 @@ export class Show
     public id: string;
     public name: string;
     public description: string;
-    public moderators: Array<{ id: string, nickName: string }>;
+    public moderators: Array<{ id: string, nickname: string }>;
     public createdDate: string;
     public profileImage: {
         id: string;
@@ -16,7 +16,7 @@ export class Show
         id: string,
         name: string,
         description: string,
-        moderators: Array<{ id: string, nickName: string }>,
+        moderators: Array<{ id: string, nickname: string }>,
         createdDate: string,
         profileImage: {
             id: string;

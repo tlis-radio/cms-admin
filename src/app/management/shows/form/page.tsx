@@ -47,7 +47,7 @@ const ShowForm: React.FC = () => {
         if (showData) {
             setValue("name", showData.name);
             setValue("description", showData.description);
-            setValue("moderators", showData.moderators.map((m) => { return { id: m.id, value: m.nickName }}));
+            setValue("moderators", showData.moderators.map((m) => { return { id: m.id, value: m.nickname }}));
             if (showData.profileImage)
             {
                 setValue("image", showData.profileImage.url);

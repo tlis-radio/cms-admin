@@ -25,7 +25,7 @@ export type ShowDto = {
 
 export type ShowModeratorDto = {
    id: string,
-   nickName: string
+   nickname: string
 };
 
 export type ShowDtoImage = {
