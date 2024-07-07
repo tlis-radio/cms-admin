@@ -68,6 +68,22 @@ const putAsync = async <T>(uri: string, body: T) : Promise<void> =>
 }
 
 const imageEndpoints = {
+    UploadBroadcastImageAsync: async (image: File, userId: string) : Promise<CreateResponse> => {
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("broadcastId", userId);
+
+        const response = await fetch("/api/image-asset-management/broadcast", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.status >= 400) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json();
+    },
     UploadUserProfileImageAsync: async (image: File, userId: string) : Promise<CreateResponse> => {
         const formData = new FormData();
         formData.append("image", image);
@@ -162,7 +178,7 @@ const broadcastEndpoints = {
     UpdateAsync: async (id: string, dto: UpdateBroadcastDto) : Promise<void> => {
         await putAsync(`/api/broadcast-management/${id}`, dto);
     },
-    UpdateProfileImageAsync: async (id: string, dto: UpdateImageBroadcastDto) : Promise<void> => {
+    UpdateImageAsync: async (id: string, dto: UpdateImageBroadcastDto) : Promise<void> => {
         await putAsync(`/api/broadcast-management/${id}/image`, dto);
     },
     DeleteAsync: async (id: string) : Promise<void> => {

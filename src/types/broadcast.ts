@@ -13,12 +13,18 @@ export type GetByIdBroadcastDto = {
     description: string,
     startDate: string,
     endDate: string,
-    show: GetByIdBroadcastDtoShow
+    show: GetByIdBroadcastDtoShow,
+    image: GetByIdBroadcastDtoImage | null
 };
 
 export type GetByIdBroadcastDtoShow = {
     id: string;
     name: string;
+};
+
+export type GetByIdBroadcastDtoImage = {
+    id: string;
+    url: string;
 };
 
 export type CreateBroadcastDto = {

@@ -11,6 +11,10 @@ export class BroadcastDetails
         id: string;
         name: string;
     }
+    public image?: {
+        id: string;
+        url: string;
+    } | null;
 
     constructor(
         id: string,
@@ -18,7 +22,8 @@ export class BroadcastDetails
         description: string,
         startDate: string,
         endDate: string,
-        show: { id: string, name: string }
+        show: { id: string, name: string },
+        image: { id: string, url: string } | null
     ) {
         this.id = id;
         this.name = name;
@@ -26,6 +31,7 @@ export class BroadcastDetails
         this.startDate = new Date(startDate);
         this.endDate = new Date(endDate);
         this.show = { id: show.id, name: show.name };
+        this.image = image ? { id: image.id, url: image.url } : null;
     }
 
     public static fromDto(id: string, dto: GetByIdBroadcastDto): BroadcastDetails
@@ -36,7 +42,8 @@ export class BroadcastDetails
             dto.description,
             dto.startDate,
             dto.endDate,
-            dto.show
+            dto.show,
+            dto.image
         );
     }
 }
