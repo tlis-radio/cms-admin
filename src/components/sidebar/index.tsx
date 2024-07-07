@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 const routes = [
     {
         icon: faFilm,
-        redirectUrl: '/management/program'
+        redirectUrl: '/management/broadcast'
     },
     {
         icon: faBullhorn,

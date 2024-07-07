@@ -1,7 +1,10 @@
+import { Broadcast } from "@/models/broadcast/broadcast";
+import { BroadcastDetails } from "@/models/broadcast/broadcast-details";
 import { Pagination, PaginationDto } from "@/models/pagination";
 import { Show } from "@/models/show";
 import { UserBasicInformations } from "@/models/user/user-basic-informations";
 import { UserDetails } from "@/models/user/user-details";
+import { BroadcastDto, CreateBroadcastDto, GetByIdBroadcastDto, UpdateBroadcastDto, UpdateImageBroadcastDto } from "@/types/broadcast";
 import { CreateResponse } from "@/types/cms-api-base-response";
 import { AllMemberships } from "@/types/membership";
 import { AllRoles } from "@/types/role";
@@ -133,6 +136,40 @@ const showEndpoints = {
     }
 };
 
+const broadcastEndpoints = {
+    PaginationAsync: async (limit: number, page: number) : Promise<Pagination<Broadcast>> => {
+        const result = await getAsync<PaginationDto<BroadcastDto>>(`/api/broadcast-management/pagination?limit=${limit}&page=${[page]}`);
+
+        return new Pagination<Broadcast>(
+            result.limit,
+            result.page,
+            result.total,
+            result.totalPages,
+            result.results.map(r => Broadcast.fromDto(r))
+        );
+    },
+    GetByIdAsync: async (id: string | null) : Promise<BroadcastDetails | undefined> => {
+        if (!id) {
+            return undefined;
+        }
+
+        const result = await getAsync<GetByIdBroadcastDto>(`/api/broadcast-management/${id}`);
+
+        return BroadcastDetails.fromDto(id, result);
+    },
+    CreateNewAsync: async (dto: CreateBroadcastDto) : Promise<CreateResponse> => 
+        await postAsync<CreateBroadcastDto, CreateResponse>("/api/broadcast-management", dto),
+    UpdateAsync: async (id: string, dto: UpdateBroadcastDto) : Promise<void> => {
+        await putAsync(`/api/broadcast-management/${id}`, dto);
+    },
+    UpdateProfileImageAsync: async (id: string, dto: UpdateImageBroadcastDto) : Promise<void> => {
+        await putAsync(`/api/broadcast-management/${id}/image`, dto);
+    },
+    DeleteAsync: async (id: string) : Promise<void> => {
+        await deleteAsync(`/api/broadcast-management/${id}`);
+    }
+};
+
 const userEndpoints = {
     PaginationAsync: async (limit: number, page: number) : Promise<Pagination<UserBasicInformations>> => {
         const result = await getAsync<PaginationDto<PaginationUserDto>>(`/api/user-management/pagination?limit=${limit}&page=${[page]}`);
@@ -181,6 +218,8 @@ class CmsApiService
     static User = userEndpoints;
 
     static Image = imageEndpoints;
+
+    static Broadcast = broadcastEndpoints;
 }
 
 export default CmsApiService;

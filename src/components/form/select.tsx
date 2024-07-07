@@ -15,7 +15,7 @@ export type SelectData = {
 type SelectProps = {
     label: string;
     error?: Merge<FieldError, FieldErrorsImpl<SelectData>> | undefined;
-    selectedOption: SelectData;
+    selectedOption: SelectData | null;
     options: Array<SelectData>;
     isLoading: boolean;
     fetchMoreData?: (options?: FetchNextPageOptions | undefined) => Promise<any>;
@@ -51,7 +51,7 @@ const Select: FunctionComponent<SelectProps> = ({
                 <div className="relative mt-1">
                     <Listbox.Button className="flex flex-row w-full bg-white items-center rounded shadow border py-2 px-2 focus:outline-none focus:shadow-outline appearance-none disabled:bg-slate-300">
                         <span className="relative w-full flex flex-wrap items-center text-left gap-2">
-                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{selectedOption.value}</span>
+                            {selectedOption && <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{selectedOption.value}</span>}
                         </span>
                         <FontAwesomeIcon className="text-gray-400" icon={faArrowsUpDown} />
                     </Listbox.Button>

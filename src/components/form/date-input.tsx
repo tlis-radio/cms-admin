@@ -19,6 +19,8 @@ const DateInput: FunctionComponent<DateInputProps> = ({ label, value, onChange, 
                 selected={value}
                 onChange={onChange}
                 isClearable={isClearable}
+                showTimeSelect={true}
+                timeFormat="HH:mm"
                 dateFormat={dateFormat ?? "dd/MM/yyyy"}
             />
         </div>
