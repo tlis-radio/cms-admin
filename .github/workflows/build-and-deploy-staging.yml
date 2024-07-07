@@ -89,8 +89,8 @@ jobs:
     - name: 'Get K8s context'
       uses: azure/aks-set-context@v3
       with:
-        resource-group: TlisKubernetes
-        cluster-name: tlis
+        resource-group: K8s
+        cluster-name: tlis-k8s
         admin: 'false'
         use-kubelogin: 'true'
     # login to Azure Container Registry
