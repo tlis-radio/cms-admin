@@ -1,13 +1,12 @@
-name: 'Build and Deploy Dev Image'
+name: 'Build and Deploy Image to Staging'
 
 on:
-  push:
-    branches: ["develop"]
+  workflow_dispatch:
 
 jobs:
   build-container-and-push-to-acr:
     name: 'Build container and push to ACR'
-    environment: 'development'
+    environment: 'staging'
     runs-on: ubuntu-latest
     steps:
     # checkout the repo
@@ -38,7 +37,7 @@ jobs:
         docker push ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/cms-admin-web:${{ github.sha }}
   build-helm-chart-and-push-to-acr:
     name: 'Build helm chart and push to ACR'
-    environment: 'development'
+    environment: 'staging'
     runs-on: ubuntu-latest
     steps:
     # checkout the repo
@@ -60,7 +59,7 @@ jobs:
     - name: 'Push chart to acr'
       run: cd chart && helm push cms-admin-web-* oci://${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/helm
   helm-chart-upgrade:
-    environment: 'development'
+    environment: 'staging'
     name: 'Upgrade helm chart'
     permissions:
       actions: read
@@ -101,4 +100,4 @@ jobs:
     # upgrade the chart
     - name: 'Upgrade chart'
       run: |
-        helm upgrade cms-admin-web oci://${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/helm/cms-admin-web --kube-context tlis --version 1.0.0 --install --create-namespace --namespace cms-development
+        helm upgrade cms-admin-web oci://${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/helm/cms-admin-web --kube-context tlis --version 1.0.0 --install --create-namespace --namespace cms-staging
