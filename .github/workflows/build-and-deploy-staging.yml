@@ -100,4 +100,4 @@ jobs:
     # upgrade the chart
     - name: 'Upgrade chart'
       run: |
-        helm upgrade cms-admin-web oci://${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/helm/cms-admin-web --kube-context tlis --version 1.0.0 --install --create-namespace --namespace cms-staging
+        helm upgrade cms-admin-web oci://${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/helm/cms-admin-web --kube-context tlis-k8s --version 1.0.0 --install --create-namespace --namespace cms-staging
