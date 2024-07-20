@@ -23,7 +23,9 @@ jobs:
       run: sed -i 's|${AUTH0_CLIENT_ID}|${{ secrets.AUTH0_CLIENT_ID }}|g' .env
     - name: 'Replace AUTH0_CLIENT_SECRET'
       run: sed -i 's|${AUTH0_CLIENT_SECRET}|${{ secrets.AUTH0_CLIENT_SECRET }}|g' .env
-    - name: 'Replace AUTH0_CLIENT_SECRET'
+    - name: 'Replace AUTH0_AUDIENCE'
+      run: sed -i 's|${AUTH0_AUDIENCE}|${{ secrets.AUTH0_AUDIENCE }}|g' .env
+    - name: 'Replace CMS_API_URL'
       run: sed -i 's|${CMS_API_URL}|${{ secrets.CMS_API_URL }}|g' .env
     # login to Azure Container Registry
     - uses: azure/docker-login@v1
