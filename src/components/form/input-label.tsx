@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import { Label } from "@headlessui/react";
 
 type InputLabelProps = {
     label: string;
@@ -6,9 +7,9 @@ type InputLabelProps = {
 
 const InputLabel: FunctionComponent<InputLabelProps> = ({label}) => {
     return (
-        <label className="text-gray-700 text-sm font-bold">
+        <Label className="text-gray-700 text-sm font-bold">
             {label}
-        </label>
+        </Label>
     );
 };
 
