@@ -27,6 +27,9 @@ export const fetchGet = async (props: fetchGet) => {
     {
         const { accessToken } = await getAccessToken();
 
+
+        console.log(accessToken);
+
         return callFetch({
             path: props.path,
             method: "GET",
