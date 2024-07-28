@@ -247,7 +247,7 @@ const UserForm: React.FC = () => {
                      <DateInput
                         label='Function Start Date'
                         value={field.functionStartDate}
-                        onChange={(ev) => { updateRoleHistory(index, { ...field, functionStartDate: ev })}}
+                        onChange={(ev) => { updateRoleHistory(index, { ...field, functionStartDate: ev as Date })}}
                      />
                      <DateInput
                         label='Function End Date'
@@ -295,7 +295,7 @@ const UserForm: React.FC = () => {
                      <DateInput
                         label='Change Date'
                         value={field.changeDate}
-                        onChange={(ev) => updateMembershipHistory(index, { ...field, changeDate: ev })}
+                        onChange={(ev) => updateMembershipHistory(index, { ...field, changeDate: ev as Date })}
                      />
                      <AreaInput
                         label='Popis'

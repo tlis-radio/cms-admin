@@ -6,7 +6,7 @@ import { Field } from "@headlessui/react";
 type DateInputProps = {
     label: string;
     value: Date | null;
-    onChange: (event: Date) => void;
+    onChange: (event: Date | null) => void;
     isClearable?: boolean;
     dateFormat?: string;
 }
@@ -18,7 +18,7 @@ const DateInput: FunctionComponent<DateInputProps> = ({ label, value, onChange, 
             <DatePicker
                 className="shadow text-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 selected={value}
-                onChange={onChange}
+                onChange={(date) => onChange(date)}
                 isClearable={isClearable}
                 showTimeSelect={true}
                 timeFormat="HH:mm"

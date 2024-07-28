@@ -3,7 +3,7 @@ import { useSearchParams } from "next/navigation";
 import PreviousButton from "./previous-button";
 import NextButton from "./next-button";
 import { Pagination } from "@/models/pagination";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import AddButton from "./add-button";
 
 type PaginationTableProps = {
@@ -28,7 +28,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     const { isLoading, data } = useQuery({
         queryKey: [queryKey, page],
         queryFn: async () => queryFn(maxRows, page),
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
         refetchOnMount: true,
         staleTime: 0
     });
