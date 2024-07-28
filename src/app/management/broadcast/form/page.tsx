@@ -33,10 +33,11 @@ const BroadcastForm: React.FC = () => {
     const imageWatch = useWatch({ control, name: "image" });
 
     const { data: broadcastData, isFetching: broadcastIsFetching, error: showError } = useQuery(
-        { queryKey: [`broadcast-${id}`], queryFn: () => CmsApiService.Broadcast.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null, refetchOnMount: true, cacheTime: 0 });
+        { queryKey: [`broadcast-${id}`], queryFn: () => CmsApiService.Broadcast.GetByIdAsync(id), staleTime: 0, enabled: id !== null, refetchOnMount: true, gcTime: 1 });
 
     const { data: showsData, isFetching: showsIsFetching, fetchNextPage: showsFetchNextPage } = useInfiniteQuery({
         queryKey: ['shows'],
+        initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }) => CmsApiService.Show.PaginationAsync(limit, pageParam),
         getNextPageParam: (lastPage) => lastPage.totalPages == lastPage.page ? undefined : lastPage.page + 1
     });

@@ -6,6 +6,7 @@ export type CreateUserDto = {
     lastname: string,
     nickname: string,
     preferNicknameOverName: boolean,
+    cmsAdminAccess: boolean;
     abouth: string,
     email: string | null,
     password: string,
@@ -32,6 +33,8 @@ export type UpdateUserDto = {
     nickname: string,
     abouth: string;
     preferNicknameOverName: boolean;
+    cmsAdminAccess: boolean;
+    email: string | null,
     roleHistory: Array<UpdateUserDtoRoleHistory>;
     membershipHistory: Array<UpdateUserDtoMembershipHistory>;
 };
@@ -69,6 +72,7 @@ export type GetByIdUserDto = {
     profileImage: GetByIdUserDtoImage;
     isActive: boolean;
     preferNicknameOverName: boolean;
+    cmsAdminAccess: boolean;
     externalId: string | null;
     email: string | null;
     roleHistory: Array<GetByIdUserDtoRoleHistory>;

@@ -13,6 +13,7 @@ export class UserDetails
     };
     public isActive: boolean;
     public preferNicknameOverName: boolean;
+    public cmsAdminAccess: boolean;
     public externalId: string | null;
     public email: string | null;
     public roleHistory: Array<{
@@ -48,6 +49,7 @@ export class UserDetails
             url: string;
         },
         preferNicknameOverName: boolean,
+        cmsAdminAccess: boolean,
         externalId: string | null,
         roleHistory: Array<{
             id: string | null;
@@ -78,6 +80,7 @@ export class UserDetails
         this.isActive = isActive;
         this.profileImage = profileImage;
         this.preferNicknameOverName = preferNicknameOverName;
+        this.cmsAdminAccess = cmsAdminAccess;
         this.externalId = externalId;
         this.roleHistory = roleHistory.map((history) => {
             return {
@@ -110,6 +113,7 @@ export class UserDetails
             dto.isActive,
             dto.profileImage,
             dto.preferNicknameOverName,
+            dto.cmsAdminAccess,
             dto.externalId,
             dto.roleHistory,
             dto.membershipHistory

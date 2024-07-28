@@ -18,12 +18,14 @@ import DateInput from '@/components/form/date-input';
 import ImageInput from '@/components/form/image-input';
 import AreaInput from '@/components/form/area-input';
 import { DevTool } from "@hookform/devtools";
+import CheckboxInput from '@/components/form/checkbox-input';
 
 type UserFormValues = {
    firstname: string;
    lastname: string;
    nickname: string;
    preferNicknameOverName: boolean;
+   cmsAdminAccess: boolean;
    abouth: string;
    email: string | null;
    password: string;
@@ -39,12 +41,14 @@ const UserForm: React.FC = () => {
       defaultValues: { firstname: "", lastname: "", nickname: "", image: null, preferNicknameOverName: true, abouth: "", email: "", roleHistory: [], membershipHistory: [] }
    });
    const imageWatch = useWatch({ control, name: "image" });
-   
+   const preferNicknameOverNameWatch = useWatch({ control, name: "preferNicknameOverName" });
+   const cmsAdminAccessWatch = useWatch({ control, name: "cmsAdminAccess" });
+
    const { fields: roleHistoryFields, append: appendRoleHistory, remove: removeRoleHistory, update: updateRoleHistory } = useFieldArray({ control, name: "roleHistory" });
    const { fields: membershipHistoryFields, append: appendMembershipHistory, remove: removeMembershipHistory, update: updateMembershipHistory } = useFieldArray({ control, name: "membershipHistory" });
 
    const { data: userData, isFetching: userIsFetching, isFetched: userIsFetched, error: userError } = useQuery(
-      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: Infinity, cacheTime: 0 });
+      { queryKey: [`user-${id}`], queryFn: () => CmsApiService.User.GetByIdAsync(id), enabled: id !== null, refetchOnMount: true, staleTime: 0, gcTime: 1 });
 
    const { data: rolesData, isFetching: rolesIsFetching, error: rolesError } = useQuery(
       { queryKey: ['roles'], queryFn: () => CmsApiService.User.GetRolesAsync(), staleTime: Infinity });
@@ -66,6 +70,7 @@ const UserForm: React.FC = () => {
          setValue("lastname", userData.lastname);
          setValue("nickname", userData.nickname);
          setValue("preferNicknameOverName", userData.preferNicknameOverName);
+         setValue("cmsAdminAccess", userData.cmsAdminAccess);
          setValue("abouth", userData.abouth);
          setValue("email", userData.email);
          if (userData.profileImage)
@@ -105,7 +110,9 @@ const UserForm: React.FC = () => {
          lastname: data.lastname,
          nickname: data.nickname,
          abouth: data.abouth,
-         preferNicknameOverName: true,
+         email: data.email,
+         preferNicknameOverName: data.preferNicknameOverName,
+         cmsAdminAccess: data.cmsAdminAccess,
          membershipHistory: data.membershipHistory.map((m) => ({
             id: m.historyId,
             membershipId: m.membership.id,
@@ -142,6 +149,7 @@ const UserForm: React.FC = () => {
          email: data.email,
          password: data.password,
          preferNicknameOverName: data.preferNicknameOverName,
+         cmsAdminAccess: data.cmsAdminAccess,
          abouth: data.abouth,
          roleHistory: data.roleHistory.map((m) => ({
             functionEndDate: m.functionEndDate?.toISOString() ?? null,
@@ -201,6 +209,20 @@ const UserForm: React.FC = () => {
             placeholder='Priezvisko uživatela'
             registerReturn={register("lastname", { required: "Uživatel musí obsahovať priezvisko." })}
             error={errors?.lastname}
+         />
+         <CheckboxInput
+            label='Umožniť prístup do admina'
+            registerReturn={register("cmsAdminAccess")}
+            checked={cmsAdminAccessWatch}
+            onChange={(checked) => setValue("cmsAdminAccess", checked)}
+            error={errors?.cmsAdminAccess}
+         />
+         <CheckboxInput
+            label='Preferovať prezývku pred menom'
+            registerReturn={register("preferNicknameOverName")}
+            checked={preferNicknameOverNameWatch}
+            onChange={(checked) => setValue("preferNicknameOverName", checked)}
+            error={errors?.preferNicknameOverName}
          />
          <AreaInput
             label='Popis uživatela'

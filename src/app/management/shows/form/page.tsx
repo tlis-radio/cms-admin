@@ -30,10 +30,11 @@ const ShowForm: React.FC = () => {
     const imageWatch = useWatch({ control, name: "image" });
 
     const { data: showData, isFetching: showIsFetching, isFetched: showIsFetched, error: showError } = useQuery(
-        { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: Infinity, enabled: id !== null, refetchOnMount: true, cacheTime: 0 });
+        { queryKey: [`show-${id}`], queryFn: () => CmsApiService.Show.GetByIdAsync(id), staleTime: 0, enabled: id !== null, refetchOnMount: true, gcTime: 1 });
 
     const { data: usersData, isFetching: usersIsFetching, fetchNextPage: usersFetchNextPage } = useInfiniteQuery({
         queryKey: ['users'],
+        initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }) => CmsApiService.User.PaginationAsync(limit, pageParam),
         getNextPageParam: (lastPage) => lastPage.totalPages == lastPage.page ? undefined : lastPage.page + 1
     });
